@@ -1,6 +1,8 @@
 # Home Assistant Add-on: Emoncms
 
-Full [emoncms](https://github.com/emoncms/emoncms) installation for Home Assistant, does not require any third-party addon
+Full [emoncms](https://github.com/emoncms/emoncms) installation for Home Assistant
+
+**DOES NOT REQUIRE ANY OTHER THIRD-PARTY ADDON**
 
 with modules graph, dashboard, sync, backup and postprocess
 
