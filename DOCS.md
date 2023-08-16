@@ -13,7 +13,7 @@ For more information, see https://github.com/emoncms/emoncms
 supposing the IP of your Home Assistant running the emoncms add-on to be 192.168.1.53, you can post datas from your local network :
 
 ```
-mosquitto_pub -h 192.168.1.53 -p 7883 -u "emonpi" -P "emonpimqtt2016" -t 'emon/test/t3' -m 43.67
+mosquitto_pub -h 192.168.1.53 -p 9883 -u "emonpi" -P "emonpimqtt2016" -t 'emon/test/t3' -m 43.67
 ```
 
 if you dont have mosquitto_pub installed and have a machine on your local network running debian/ubuntu : `sudo apt-get install mosquitto-clients`
