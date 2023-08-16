@@ -23,6 +23,15 @@ else
     echo "Using existing mariadb"
 fi
 
+OPTIONS_JSON=/data/options.json
+
+if [ -f $OPTIONS_JSON ]; then
+    USER=$(jq --raw-output '.MQTT_USER // empty' $OPTIONS_JSON)
+    PASSWORD=$(jq --raw-output '.MQTT_PASSWORD // empty' $OPTIONS_JSON)
+    if [ "$USER" ]; then MQTT_USER=$USER; fi
+    if [ "$PASSWORD" ]; then MQTT_PASSWORD=$PASSWORD; fi
+fi
+
 cd $OEM_DIR
 
 # REGENERATING CONF FILES FROM ENV VARS

@@ -1,9 +1,10 @@
 FROM alpine:3.16
 
-ARG TARGETPLATFORM
-ARG S6_OVERLAY_VERSION=3.1.5.0
-ARG S6_SRC=https://github.com/just-containers/s6-overlay/releases/download
-ARG S6_DIR=/etc/s6-overlay/s6-rc.d
+ARG \
+	TARGETPLATFORM \
+	S6_OVERLAY_VERSION=3.1.5.0 \
+	S6_SRC=https://github.com/just-containers/s6-overlay/releases/download \
+	S6_DIR=/etc/s6-overlay/s6-rc.d
 
 ENV TZ="Europe/Paris"
 
@@ -47,7 +48,7 @@ ARG \
 
 RUN apk update && apk upgrade
 
-RUN apk add --no-cache tzdata xz bash git make tar;\
+RUN apk add --no-cache tzdata xz bash git make tar jq;\
 	apk add --no-cache sed nano;\
 	apk add --no-cache python3;\
 	apk add --no-cache ca-certificates wget;\

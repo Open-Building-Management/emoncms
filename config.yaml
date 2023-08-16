@@ -13,3 +13,9 @@ arch:
 ports:
   80/tcp: 8002
   1883/tcp: 9883
+options:
+  MQTT_USER: emonpi
+  MQTT_PASSWORD: emonpimqtt2016
+schema:
+  MQTT_USER: str
+  MQTT_PASSWORD: str
