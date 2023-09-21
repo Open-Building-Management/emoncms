@@ -28,9 +28,17 @@ OPTIONS_JSON=/data/options.json
 if [ -f $OPTIONS_JSON ]; then
     USER=$(jq --raw-output '.MQTT_USER // empty' $OPTIONS_JSON)
     PASSWORD=$(jq --raw-output '.MQTT_PASSWORD // empty' $OPTIONS_JSON)
+    LOG_LEVEL=$(jq --raw-output '.MQTT_LOG_LEVEL // empty' $OPTIONS_JSON)
+    HOST=$(jq --raw-output '.MQTT_HOST // empty' $OPTIONS_JSON)
     if [ "$USER" ]; then MQTT_USER=$USER; fi
     if [ "$PASSWORD" ]; then MQTT_PASSWORD=$PASSWORD; fi
+    if [ "$LOG_LEVEL" ]; then MQTT_LOG_LEVEL=$LOG_LEVEL; fi
+    if [ "$HOST" ]; then MQTT_HOST=$HOST; fi
+    LOCAL_TZ=$(jq --raw-output '.TZ // empty' $OPTIONS_JSON)
+    if [ "$LOCAL_TZ" ]; then TZ=$LOCAL_TZ; fi
 fi
+
+cp /usr/share/zoneinfo/$TZ /etc/localtime
 
 cd $OEM_DIR
 
@@ -39,6 +47,15 @@ echo "CREATING /etc/my.cnf"
 mv /etc/my.cnf /etc/my.old
 echo "[mysqld]" >> /etc/my.cnf
 echo "datadir=$EMONCMS_DATADIR/mysql" >> /etc/my.cnf
+
+echo "CREATING MQTT CONF"
+echo "persistence false" >> $MQTT_CONF
+echo "allow_anonymous false" >> $MQTT_CONF
+echo "listener 1883" >> $MQTT_CONF
+echo "password_file /etc/mosquitto/passwd" >> $MQTT_CONF
+echo "log_dest stdout" >> $MQTT_CONF
+echo "log_timestamp_format %Y-%m-%dT%H:%M:%S" >> $MQTT_CONF
+for level in $MQTT_LOG_LEVEL; do echo "log_type $level" >> $MQTT_CONF; done;
 
 echo "GENERATING EMONCMS SETTINGS.INI"
 echo "emoncms_dir = '$EMONCMS_DIR'" > settings.ini
@@ -54,6 +71,7 @@ echo "enabled = true" >> settings.ini
 echo "prefix = ''" >> settings.ini
 echo "[mqtt]" >> settings.ini
 echo "enabled = true" >> settings.ini
+echo "host = '$MQTT_HOST'" >> settings.ini
 echo "user = '$MQTT_USER'" >> settings.ini
 echo "password = '$MQTT_PASSWORD'" >> settings.ini
 echo "[feed]" >> settings.ini

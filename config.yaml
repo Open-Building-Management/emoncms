@@ -14,8 +14,14 @@ ports:
   80/tcp: 8002
   1883/tcp: 9883
 options:
+  TZ: Europe/Paris
+  MQTT_HOST: localhost
   MQTT_USER: emonpi
   MQTT_PASSWORD: emonpimqtt2016
+  MQTT_LOG_LEVEL: error
 schema:
+  TS: str
+  MQTT_HOST: str
   MQTT_USER: str
   MQTT_PASSWORD: str
+  MQTT_LOG_LEVEL: list(error|information|notice|all)
