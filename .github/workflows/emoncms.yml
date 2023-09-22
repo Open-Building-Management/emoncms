@@ -29,4 +29,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: alexjunk/emoncms:alpine3.16
+          tags: alexjunk/emoncms:alpine3.16.1

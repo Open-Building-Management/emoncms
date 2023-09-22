@@ -1,5 +1,11 @@
 # Changelog
 
+## alpine3.16.1
+
+adding the ability to configure timezone, mqtt host and log level
+
+fixed format for mqtt level to something more readable than unix timestamp
+
 ## alpine3.16
 
 emoncms 11.3.22
