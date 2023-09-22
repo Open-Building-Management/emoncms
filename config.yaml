@@ -1,6 +1,6 @@
 name: emoncms
 description: The webapp for energy monitoring and more
-version: alpine3.16
+version: alpine3.16.1
 image: alexjunk/emoncms
 webui: http://[HOST]:[PORT:8002]
 slug: emoncms
