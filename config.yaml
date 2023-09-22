@@ -20,7 +20,7 @@ options:
   MQTT_PASSWORD: emonpimqtt2016
   MQTT_LOG_LEVEL: error
 schema:
-  TS: str
+  TZ: str
   MQTT_HOST: str
   MQTT_USER: str
   MQTT_PASSWORD: str
