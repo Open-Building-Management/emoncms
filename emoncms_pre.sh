@@ -49,7 +49,7 @@ echo "[mysqld]" >> /etc/my.cnf
 echo "datadir=$EMONCMS_DATADIR/mysql" >> /etc/my.cnf
 
 echo "CREATING MQTT CONF"
-echo "persistence false" >> $MQTT_CONF
+echo "persistence false" > $MQTT_CONF
 echo "allow_anonymous false" >> $MQTT_CONF
 echo "listener 1883" >> $MQTT_CONF
 echo "password_file /etc/mosquitto/passwd" >> $MQTT_CONF
