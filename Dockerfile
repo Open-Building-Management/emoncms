@@ -114,6 +114,7 @@ RUN set -x;\
 RUN set -x;\
 	make module name=graph;\
 	make module name=dashboard;\
+	make module name=app;\
 	make symodule name=sync;\
 	make symodule name=postprocess;\
 	make symodule name=backup;\
