@@ -75,7 +75,7 @@ echo "user = '$MQTT_USER'" >> settings.ini
 echo "password = '$MQTT_PASSWORD'" >> settings.ini
 echo "[feed]" >> settings.ini
 echo "engines_hidden = [0,6,10]" >> settings.ini
-echo "redisbuffer[enabled] = true" >> settings.ini
+echo "redisbuffer[enabled] = $REDIS_BUFFER" >> settings.ini
 echo "redisbuffer[sleep] = 300" >> settings.ini
 echo "phpfina[datadir] = '$EMONCMS_DATADIR/phpfina/'" >> settings.ini
 echo "phptimeseries[datadir] = '$EMONCMS_DATADIR/phptimeseries/'" >> settings.ini

@@ -197,13 +197,20 @@ RUN set -x;\
 	echo "php $WWW/emoncms/scripts/services/emoncms_mqtt/emoncms_mqtt.php" >> $S6_DIR/emoncms_mqtt/run;\
 	echo "s6-setuidgid $DAEMON" >> $S6_DIR/service-runner/run;\
 	echo "python3 $WWW/emoncms/scripts/services/service-runner/service-runner.py" >> $S6_DIR/service-runner/run;\
-	echo "s6-setuidgid $DAEMON" >> $S6_DIR/feedwriter/run;\
-	echo "php $WWW/emoncms/scripts/feedwriter.php" >> $S6_DIR/feedwriter/run;\
+	echo "#!/command/with-contenv sh" > $S6_DIR/feedwriter/run;\
+	echo "if [ \"\${REDIS_BUFFER}\" -ne 1 ]; then" >> $S6_DIR/feedwriter/run;\
+	echo "    echo \"FEEDWRITER IS MUTED !\"" >> $S6_DIR/feedwriter/run;\
+	echo "    s6-svc -O ." >> $S6_DIR/feedwriter/run;\
+	echo "    exit 0" >> $S6_DIR/feedwriter/run;\
+	echo "fi" >> $S6_DIR/feedwriter/run;\
+	echo "exec s6-setuidgid $DAEMON php $WWW/emoncms/scripts/feedwriter.php" >> $S6_DIR/feedwriter/run;\
 	#chown $DAEMON $OEM_DIR;\
 	chown -R $DAEMON $WWW/emoncms;\
 	chown -R $DAEMON $EMONCMS_DIR;\
 	chmod +x emoncms_pre.sh;\
 	chmod +x sql_ready.sh
+
+#COPY run $S6_DIR/feedwriter/run
 
 # ENV vars used when starting the container
 # fixing S6_SERVICES_GRACETIME & S6_CMD_WAIT_FOR_SERVICES_MAXTIME : 
@@ -212,13 +219,15 @@ ENV \
 	S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
 	S6_SERVICES_GRACETIME=18000 \
 	PHP_VER=$PHP_VER \
-	PHP_CONF=$PHP_CONF
+	PHP_CONF=$PHP_CONF \
+	S6_DIR=$S6_DIR
 # ENV vars below can be customized by the user at runtime
 # the sql database and the timeseries will be in /data/emoncms but it can be changed
 ENV \
 	TZ="Europe/Paris" \
 	EMONCMS_DATADIR=/data/emoncms \
 	TS="phpfina phpfiwa phptimeseries" \
+	REDIS_BUFFER=1 \
 	MYSQL_DATABASE=emoncms \
 	MYSQL_USER=emoncms \
 	MYSQL_PASSWORD=emonpiemoncmsmysql2016 \
