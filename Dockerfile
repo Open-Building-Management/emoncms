@@ -1,52 +1,40 @@
-FROM alpine:3.16
+ARG BUILD_FROM=alpine:3.16
+
+FROM $BUILD_FROM
 
 ARG \
 	TARGETPLATFORM \
 	S6_OVERLAY_VERSION=3.1.5.0 \
 	S6_SRC=https://github.com/just-containers/s6-overlay/releases/download \
-	S6_DIR=/etc/s6-overlay/s6-rc.d
-
-ENV TZ="Europe/Paris"
-
-# the sql database and the timeseries will be in /data/emoncms but it can be changed
-# we start with the sql database
-# DAEMON is the user running the workers
-# it must be the same as the one running the webserver
-# on alpine, httpd user is apache and not www-data
-ENV \
-	DAEMON=apache \
-	EMONCMS_DATADIR=/data/emoncms \
-	TS="phpfina phpfiwa phptimeseries" \
-	MYSQL_DATABASE=emoncms \
-	MYSQL_USER=emoncms \
-	MYSQL_PASSWORD=emonpiemoncmsmysql2016 \
-	MQTT_USER=emonpi \
-	MQTT_PASSWORD=emonpimqtt2016 \
-	WWW=/var/www \
-	OEM_DIR=/opt/openenergymonitor \
-	EMONCMS_DIR=/opt/emoncms \
-	EMONCMS_LOG_LOCATION=/var/log/emoncms \
-	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
+	S6_DIR=/etc/s6-overlay/s6-rc.d \
+	PRIMOS="apache2 redis mosquitto mariadb" \
+	SECONDOS="emoncms_mqtt service-runner feedwriter" \
+ 	HTTP_CONF=/etc/apache2/httpd.conf \
+ 	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
 	PHP_VER=8 \
 	# we dont modify php.ini, we create new extensions in conf.d
 	PHP_CONF=/etc/php8/conf.d \
-	MQTT_CONF=/etc/mosquitto/mosquitto.conf \
-	MQTT_HOST=localhost \
-	MQTT_LOG_LEVEL=error
-
-# /data creation
-RUN mkdir -p /data
-
-ARG \
-	PRIMOS="apache2 redis mosquitto mariadb" \
-	SECONDOS="emoncms_mqtt service-runner feedwriter" \
-	HTTP_CONF=/etc/apache2/httpd.conf \
 	REDIS_CONF=/etc/redis.conf \
 	# source for Mosquitto-PHP extension
 	# original repo is https://github.com/mgdm/Mosquitto-PHP
 	# but it does not work for php8
 	MOSQUITTO_PHP=https://github.com/openenergymonitor/Mosquitto-PHP \
 	EMONCMS_SRC=https://github.com/emoncms/emoncms
+
+# ENV vars used during build PLUS when starting the container
+# DAEMON is the user running the workers
+# it must be the same as the one running the webserver
+# on alpine, httpd user is apache and not www-data
+ENV \
+	DAEMON=apache \
+	WWW=/var/www \
+	OEM_DIR=/opt/openenergymonitor \
+	EMONCMS_DIR=/opt/emoncms \
+	EMONCMS_LOG_LOCATION=/var/log/emoncms \
+ 	MQTT_CONF=/etc/mosquitto/mosquitto.conf
+
+# /data creation
+RUN mkdir -p /data
 
 RUN apk update && apk upgrade
 
@@ -216,9 +204,27 @@ RUN set -x;\
 	chmod +x emoncms_pre.sh;\
 	chmod +x sql_ready.sh
 
-# this is necessary as we launch mysql_install_db at startup
-ENV S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
-ENV S6_SERVICES_GRACETIME=18000
+# ENV vars used when starting the container
+# fixing S6_SERVICES_GRACETIME & S6_CMD_WAIT_FOR_SERVICES_MAXTIME : 
+# necessary as we launch mysql_install_db at startup
+ENV \
+	S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
+	S6_SERVICES_GRACETIME=18000 \
+	PHP_VER=$PHP_VER \
+	PHP_CONF=$PHP_CONF
+# ENV vars below can be customized by the user at runtime
+# the sql database and the timeseries will be in /data/emoncms but it can be changed
+ENV \
+	TZ="Europe/Paris" \
+	EMONCMS_DATADIR=/data/emoncms \
+	TS="phpfina phpfiwa phptimeseries" \
+	MYSQL_DATABASE=emoncms \
+	MYSQL_USER=emoncms \
+	MYSQL_PASSWORD=emonpiemoncmsmysql2016 \
+	MQTT_USER=emonpi \
+	MQTT_PASSWORD=emonpimqtt2016 \
+	MQTT_HOST=localhost \
+	MQTT_LOG_LEVEL=error
 
 EXPOSE 80 1883
 
