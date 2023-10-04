@@ -9,7 +9,6 @@ if ! [ -d "$EMONCMS_DATADIR" ]; then
     mkdir -p "$EMONCMS_DATADIR/backup/uploads"
     for i in $TS; do mkdir -p "$EMONCMS_DATADIR/$i"; done
     chown -R "$DAEMON" "$EMONCMS_DATADIR"
-    
 else
     echo "Using existing timeseries"
 fi
