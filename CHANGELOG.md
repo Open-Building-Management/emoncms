@@ -1,5 +1,9 @@
 # Changelog
 
+## alpine3.16.2
+
+addition of the app module
+
 ## alpine3.16.1
 
 adding the ability to configure timezone, mqtt host and log level
