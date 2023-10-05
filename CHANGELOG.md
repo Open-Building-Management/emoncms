@@ -1,5 +1,11 @@
 # Changelog
 
+## alpine3.16.3
+
+ability to mute the feedwriter and to leave the low write mode
+
+ability to modulate the emoncms log lvel (1,2,3)
+
 ## alpine3.16.2
 
 addition of the app module
