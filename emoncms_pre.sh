@@ -35,6 +35,9 @@ if [ -f $OPTIONS_JSON ]; then
     if [ "$HOST" ]; then MQTT_HOST=$HOST; fi
     LOCAL_TZ=$(jq --raw-output '.TZ // empty' $OPTIONS_JSON)
     if [ "$LOCAL_TZ" ]; then TZ=$LOCAL_TZ; fi
+    LOG_LEVEL=$(jq --raw-output '.EMONCMS_LOG_LEVEL // empty' $OPTIONS_JSON)
+    if [ "$LOG_LEVEL" ]; then EMONCMS_LOG_LEVEL=$LOG_LEVEL; fi
+    REDIS_BUFFER=$(jq --raw-output 'if .LOW_WRITE_MODE==true then 1 else 0 end' $OPTIONS_JSON)
 fi
 
 cp /usr/share/zoneinfo/$TZ /etc/localtime
@@ -85,7 +88,7 @@ echo "feedviewpath = 'graph/'" >> settings.ini
 echo "favicon = 'favicon_emonpi.png'" >> settings.ini
 echo "[log]" >> settings.ini
 echo "; Log Level: 1=INFO, 2=WARN, 3=ERROR" >> settings.ini
-echo "level = 2" >> settings.ini
+echo "level = $EMONCMS_LOG_LEVEL" >> settings.ini
 cp settings.ini $WWW/emoncms/settings.ini
 
 echo "CREATING USER/PWD FOR MOSQUITTO"

@@ -19,9 +19,13 @@ options:
   MQTT_USER: emonpi
   MQTT_PASSWORD: emonpimqtt2016
   MQTT_LOG_LEVEL: error
+  EMONCMS_LOG_LEVEL: 2
+  LOW_WRITE_MODE: true
 schema:
   TZ: str
   MQTT_HOST: str
   MQTT_USER: str
   MQTT_PASSWORD: str
   MQTT_LOG_LEVEL: list(error|information|notice|all)
+  EMONCMS_LOG_LEVEL: list(1|2|3)
+  LOW_WRITE_MODE: bool

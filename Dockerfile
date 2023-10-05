@@ -228,6 +228,7 @@ ENV \
 	EMONCMS_DATADIR=/data/emoncms \
 	TS="phpfina phpfiwa phptimeseries" \
 	REDIS_BUFFER=1 \
+	EMONCMS_LOG_LEVEL=2 \
 	MYSQL_DATABASE=emoncms \
 	MYSQL_USER=emoncms \
 	MYSQL_PASSWORD=emonpiemoncmsmysql2016 \
