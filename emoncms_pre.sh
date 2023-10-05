@@ -112,3 +112,4 @@ echo "upload_max_filesize=3G" >> $PHP_CONF/backup.ini
 echo "upload_tmp_dir=$EMONCMS_DATADIR/backup/uploads" >> $PHP_CONF/backup.ini
 
 printf "$NEW_INSTALL" > /var/run/s6/container_environment/NEW_INSTALL
+printf "$REDIS_BUFFER" > /var/run/s6/container_environment/REDIS_BUFFER
