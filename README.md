@@ -4,7 +4,7 @@ Full [emoncms](https://github.com/emoncms/emoncms) installation for Home Assista
 
 **DOES NOT REQUIRE ANY OTHER THIRD-PARTY ADDON**
 
-with modules graph, dashboard, sync, backup and postprocess
+with modules graph, dashboard, app, sync, backup and postprocess
 
 Architectures :
 - arm64
