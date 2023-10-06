@@ -6,6 +6,8 @@ webui: http://[HOST]:[PORT:8002]
 slug: emoncms
 url: https://github.com/Open-Building-Management/emoncms/issues
 init: false
+panel_icon: mdi:puzzle
+panel_title: emoncms
 arch:
   - armv7
   - aarch64
