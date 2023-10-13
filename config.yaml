@@ -11,7 +11,7 @@ arch:
   - aarch64
   - amd64
 services:
-  - emoncms:provide
+  - mqtt:provide
 ports:
   80/tcp: 8002
   1883/tcp: 9883
