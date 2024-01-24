@@ -1,4 +1,4 @@
-name: emoncms docker images to docker hub
+name: emoncms docker images to docker hub -  mention of emoncms version
 
 on:
   workflow_dispatch:
