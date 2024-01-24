@@ -35,7 +35,7 @@ jobs:
         id: emoncms_version
         name: get emoncms version
         run: |
-          wget https://raw.githubusercontent.com/emoncms/emoncms/master/version.json
+          wget https://raw.githubusercontent.com/emoncms/emoncms/stable/version.json
           master=$(cat version.json | jq --raw-output '.version')
           echo $master
           echo "master=$master" >> "$GITHUB_OUTPUT"
