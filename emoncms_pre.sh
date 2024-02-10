@@ -1,5 +1,7 @@
 #!/command/with-contenv sh
 
+cp /usr/share/zoneinfo/$TZ /etc/localtime
+
 NEW_INSTALL=0
 
 if ! [ -d "$EMONCMS_DATADIR" ]; then
@@ -40,11 +42,49 @@ if [ -f $OPTIONS_JSON ]; then
     REDIS_BUFFER=$(jq --raw-output 'if .LOW_WRITE_MODE==true then 1 else 0 end' $OPTIONS_JSON)
 fi
 
-cp /usr/share/zoneinfo/$TZ /etc/localtime
-
 cd $OEM_DIR
 
 # REGENERATING CONF FILES FROM ENV VARS
+echo "CUSTOMIZING APACHE CONF FOR EMONCMS"
+#CNAME=$(openssl x509 -noout -subject -in $CERT_FILE | sed 's/.*CN = //')
+mv /etc/apache2/conf.d/ssl.conf /etc/apache2/conf.d/ssl.old
+# double quotes in order to use a shell var
+sed -i "s/^#ServerName.*/ServerName $CNAME/" $HTTP_CONF
+sed -i '/LoadModule rewrite_module/s/^#//g' $HTTP_CONF
+#sed -i 's/^#LoadModule rewrite/LoadModule rewrite/' $HTTP_CONF
+# delete between 2 patterns with sed
+# https://techstop.github.io/delete-lines-strings-between-two-patterns-sed/
+#sed -i '/<Directory "\/var\/www\/localhost\/htdocs\">/,/<\/Directory>/d' $HTTP_CONF
+# replace all occurences of localhost/htdocs by emoncms
+sed -i 's/localhost\/htdocs/emoncms/g' $HTTP_CONF
+VIRTUAL_HOST=/etc/apache2/conf.d/emoncms.conf
+echo "<VirtualHost *:80>" > $VIRTUAL_HOST
+#echo "    ServerName $CNAME" >> $VIRTUAL_HOST
+echo "    <Directory $WWW/emoncms>" >> $VIRTUAL_HOST
+echo "        Options FollowSymLinks" >> $VIRTUAL_HOST
+echo "        AllowOverride All" >> $VIRTUAL_HOST
+echo "        DirectoryIndex index.php" >> $VIRTUAL_HOST
+echo "        Require all granted" >> $VIRTUAL_HOST
+echo "    </Directory>" >> $VIRTUAL_HOST
+echo "</VirtualHost>" >> $VIRTUAL_HOST
+echo "LoadModule ssl_module modules/mod_ssl.so" >> $VIRTUAL_HOST
+echo "LoadModule socache_shmcb_module modules/mod_socache_shmcb.so" >> $VIRTUAL_HOST
+echo "Listen 443" >> $VIRTUAL_HOST
+echo "SSLSessionCache \"shmcb:/var/cache/mod_ssl/scache(512000)\"" >> $VIRTUAL_HOST
+echo "SSLSessionCacheTimeout 300" >> $VIRTUAL_HOST
+echo "<VirtualHost *:443>" >> $VIRTUAL_HOST
+echo "    SSLEngine on" >> $VIRTUAL_HOST
+echo "    SSLcertificateFile $CRT_FILE" >> $VIRTUAL_HOST
+echo "    SSLCertificateKeyFile $KEY_FILE" >> $VIRTUAL_HOST
+#echo "    ServerName $CNAME" >> $VIRTUAL_HOST
+echo "    <Directory $WWW/emoncms>" >> $VIRTUAL_HOST
+echo "        Options FollowSymLinks" >> $VIRTUAL_HOST
+echo "        AllowOverride All" >> $VIRTUAL_HOST
+echo "        DirectoryIndex index.php" >> $VIRTUAL_HOST
+echo "        Require all granted" >> $VIRTUAL_HOST
+echo "    </Directory>" >> $VIRTUAL_HOST
+echo "</VirtualHost>" >> $VIRTUAL_HOST
+
 echo "CREATING /etc/my.cnf"
 mv /etc/my.cnf /etc/my.old
 echo "[mysqld]" >> /etc/my.cnf

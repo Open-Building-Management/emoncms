@@ -4,12 +4,11 @@ FROM $BUILD_FROM
 
 ARG \
 	TARGETPLATFORM \
-	S6_OVERLAY_VERSION=3.1.5.0 \
+	S6_OVERLAY_VERSION=3.1.6.2 \
 	S6_SRC=https://github.com/just-containers/s6-overlay/releases/download \
 	S6_DIR=/etc/s6-overlay/s6-rc.d \
 	PRIMOS="apache2 redis mosquitto mariadb" \
 	SECONDOS="emoncms_mqtt service-runner feedwriter" \
- 	HTTP_CONF=/etc/apache2/httpd.conf \
  	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
 	PHP_VER=8 \
 	# we dont modify php.ini, we create new extensions in conf.d
@@ -31,7 +30,7 @@ ENV \
 	OEM_DIR=/opt/openenergymonitor \
 	EMONCMS_DIR=/opt/emoncms \
 	EMONCMS_LOG_LOCATION=/var/log/emoncms \
- 	MQTT_CONF=/etc/mosquitto/mosquitto.conf
+	MQTT_CONF=/etc/mosquitto/mosquitto.conf
 
 # /data creation
 RUN mkdir -p /data
@@ -42,7 +41,7 @@ RUN apk add --no-cache tzdata xz bash git make tar jq;\
 	apk add --no-cache sed nano;\
 	apk add --no-cache python3;\
 	apk add --no-cache ca-certificates wget;\
-	apk add --no-cache apache2 gettext;\
+	apk add --no-cache apache2 apache2-ssl gettext;\
 	apk add --no-cache mariadb mariadb-client;\
 	apk add --no-cache redis;\
 	apk add --no-cache mosquitto
@@ -87,28 +86,14 @@ WORKDIR $OEM_DIR
 
 COPY makefile .
 
-# apache2/emoncms conf
-RUN set -x;\
-	# the following 3 lines are for the admin module : not nice ;-(
-	# in container the admin module is just to see emoncms log
-	# solution could be not to use admin module anymore
-	# for this set enable_admin_ui to false
+# the following 3 lines are for the admin module : not nice ;-(
+# in container the admin module is just to see emoncms log
+# solution could be not to use admin module anymore
+# for this set enable_admin_ui to false
+RUN set -x;\	
 	git config --system --replace-all safe.directory '*';\
 	git clone https://github.com/openenergymonitor/EmonScripts;\
-	cp EmonScripts/install/emonsd.config.ini EmonScripts/install/config.ini;\
-	sed -i 's/^#ServerName.*/ServerName localhost/' $HTTP_CONF;\
-	sed -i '/LoadModule rewrite_module/s/^#//g' $HTTP_CONF;\
-	#sed -i 's/^#LoadModule rewrite/LoadModule rewrite/' $HTTP_CONF;\
-	# delete between 2 patterns with sed
-	# https://techstop.github.io/delete-lines-strings-between-two-patterns-sed/
-	sed -i '/<Directory "\/var\/www\/localhost\/htdocs\">/,/<\/Directory>/d' $HTTP_CONF;\
-	sed -i 's/localhost\/htdocs/emoncms/g' $HTTP_CONF;\
-	echo "<Directory $WWW/emoncms>" >> $HTTP_CONF;\
-	echo "    Options FollowSymLinks" >> $HTTP_CONF;\
-	echo "    AllowOverride All" >> $HTTP_CONF;\
-	echo "    DirectoryIndex index.php" >> $HTTP_CONF;\
-	echo "    Require all granted" >> $HTTP_CONF;\
-	echo "</Directory>" >> $HTTP_CONF
+	cp EmonScripts/install/emonsd.config.ini EmonScripts/install/config.ini
 
 # emoncms modules
 RUN set -x;\
@@ -150,8 +135,7 @@ RUN set -x;\
 	# this will remove sources for phpredis and Mosquitto-PHP
 	rm -Rf $OEM_DIR/phpredis
 
-COPY emoncms_pre.sh .
-COPY sql_ready.sh .
+COPY emoncms_pre.sh sql_ready.sh ./
 
 # we create dynamically the database update script 
 # as it uses the $WWW env which will not be available at run time in php 
@@ -229,8 +213,6 @@ RUN set -x;\
 	chmod +x emoncms_pre.sh;\
 	chmod +x sql_ready.sh
 
-#COPY run $S6_DIR/feedwriter/run
-
 # ENV vars used when starting the container
 # fixing S6_SERVICES_GRACETIME & S6_CMD_WAIT_FOR_SERVICES_MAXTIME : 
 # necessary as we launch mysql_install_db at startup
@@ -238,8 +220,7 @@ ENV \
 	S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
 	S6_SERVICES_GRACETIME=18000 \
 	PHP_VER=$PHP_VER \
-	PHP_CONF=$PHP_CONF \
-	S6_DIR=$S6_DIR
+	PHP_CONF=$PHP_CONF
 # ENV vars below can be customized by the user at runtime
 # the sql database and the timeseries will be in /data/emoncms but it can be changed
 ENV \
@@ -254,7 +235,11 @@ ENV \
 	MQTT_USER=emonpi \
 	MQTT_PASSWORD=emonpimqtt2016 \
 	MQTT_HOST=localhost \
-	MQTT_LOG_LEVEL=error
+	MQTT_LOG_LEVEL=error \
+	HTTP_CONF=/etc/apache2/httpd.conf \
+	CRT_FILE=/etc/ssl/apache2/server.pem \
+	KEY_FILE=/etc/ssl/apache2/server.key \
+	CNAME=localhost
 
 EXPOSE 80 1883
 
