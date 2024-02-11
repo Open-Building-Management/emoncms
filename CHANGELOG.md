@@ -1,5 +1,11 @@
 # Changelog
 
+## alpine3.18_emoncms11.4.11
+
+ability to configure TLS/HTTPS
+
+new tagging process integrating emoncms version number
+
 ## alpine3.16.3
 
 ability to mute the feedwriter and to leave the low write mode

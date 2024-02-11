@@ -40,6 +40,12 @@ if [ -f $OPTIONS_JSON ]; then
     LOG_LEVEL=$(jq --raw-output '.EMONCMS_LOG_LEVEL // empty' $OPTIONS_JSON)
     if [ "$LOG_LEVEL" ]; then EMONCMS_LOG_LEVEL=$LOG_LEVEL; fi
     REDIS_BUFFER=$(jq --raw-output 'if .LOW_WRITE_MODE==true then 1 else 0 end' $OPTIONS_JSON)
+    CRT=$(jq --raw-output '.CRT_FILE // empty' $OPTIONS_JSON)
+    KEY=$(jq --raw-output '.KEY_FILE // empty' $OPTIONS_JSON)
+    NAME=$(jq --raw-output '.CNAME // empty' $OPTIONS_JSON)
+    if [ "$CRT" ]; then CRT_FILE=$CRT; fi
+    if [ "$KEY" ]; then KEY_FILE=$KEY; fi
+    if [ "$NAME" ]; then CNAME=$KCNAME; fi
 fi
 
 cd $OEM_DIR
