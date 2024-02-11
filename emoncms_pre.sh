@@ -45,7 +45,7 @@ if [ -f $OPTIONS_JSON ]; then
     NAME=$(jq --raw-output '.CNAME // empty' $OPTIONS_JSON)
     if [ "$CRT" ]; then CRT_FILE=$CRT; fi
     if [ "$KEY" ]; then KEY_FILE=$KEY; fi
-    if [ "$NAME" ]; then CNAME=$KCNAME; fi
+    if [ "$NAME" ]; then CNAME=$NAME; fi
 fi
 
 cd $OEM_DIR
