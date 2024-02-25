@@ -235,10 +235,14 @@ ENV \
 	MQTT_USER=emonpi \
 	MQTT_PASSWORD=emonpimqtt2016 \
 	MQTT_HOST=localhost \
+	MQTT_BASETOPIC=emon \
+	MQTT_CLIENT_ID=emoncms \
 	MQTT_LOG_LEVEL=error \
 	HTTP_CONF=/etc/apache2/httpd.conf \
 	CRT_FILE=/etc/ssl/apache2/server.pem \
 	KEY_FILE=/etc/ssl/apache2/server.key \
+	ENFORCE_SECURITY=1 \
+	USE_HOSTNAME_FOR_MQTT_TOPIC_CLIENTID=0 \
 	CNAME=localhost
 
 EXPOSE 80 1883

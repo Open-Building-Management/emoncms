@@ -1,4 +1,4 @@
-name: emoncms docker images to docker hub
+name: emoncms docker images to docker hub latest tag
 
 on:
   workflow_dispatch:
@@ -9,12 +9,8 @@ jobs:
     strategy:
       matrix:
         include:
-        - alpine_version: 3.16
-          php_version: 8
-          tag: 3.16.3
         - alpine_version: 3.18
           php_version: 81
-          tag: 3.18
     steps:
       -
         name: Checkout
@@ -42,4 +38,4 @@ jobs:
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
           push: true
-          tags: alexjunk/emoncms:alpine${{ matrix.tag }}
+          tags: alexjunk/emoncms:latest

@@ -90,6 +90,18 @@ echo "        DirectoryIndex index.php" >> $VIRTUAL_HOST
 echo "        Require all granted" >> $VIRTUAL_HOST
 echo "    </Directory>" >> $VIRTUAL_HOST
 echo "</VirtualHost>" >> $VIRTUAL_HOST
+if [ "$ENFORCE_SECURITY" -eq 1 ]; then
+    SECURITY=/etc/apache2/conf.d/security.conf
+    echo "<IfModule mod_headers.c>" > $SECURITY
+    echo "#Header set Content-Security-Policy \"script-src * 'unsafe-inline' ; style-src * 'unsafe-inline'\"" >> $SECURITY
+    echo "Header set X-Content-Type-Options \"nosniff\"" >> $SECURITY
+    echo "Header always set Strict-Transport-Security \"max-age=16070400; includeSubDomains\"" >> $SECURITY
+    echo "Header always set X-Frame-Options \"SAMEORIGIN\"" >> $SECURITY
+    echo "Header always set Referrer-Policy \"same-origin\"" >> $SECURITY
+    echo "Header set X-XSS-Protection \"1; mode=block\"" >> $SECURITY
+    echo "Header set Permissions-Policy \"accelerometer=(), geolocation=(), fullscreen=(), microphone=(), camera=(), display-capture=()\"" >> $SECURITY
+    echo "</IfModule>" >> $SECURITY
+fi
 
 echo "CREATING /etc/my.cnf"
 mv /etc/my.cnf /etc/my.old
@@ -120,6 +132,17 @@ echo "prefix = ''" >> settings.ini
 echo "[mqtt]" >> settings.ini
 echo "enabled = true" >> settings.ini
 echo "host = '$MQTT_HOST'" >> settings.ini
+if [ "$USE_HOSTNAME_FOR_MQTT_TOPIC_CLIENTID" -eq 1 ]; then
+    BASETOPIC=$MQTT_BASETOPIC\_$HOSTNAME
+    CLIENT_ID=$MQTT_CLIENT_ID\_$HOSTNAME
+    echo "using a custom MQTT basetopic $BASETOPIC"
+    echo "basetopic = '$BASETOPIC'" >> settings.ini
+    echo "using a custom MQTT client_id $CLIENT_ID"
+    echo "client_id = '$CLIENT_ID'" >> settings.ini
+else
+    echo "basetopic = '$MQTT_BASETOPIC'" >> settings.ini
+    echo "client_id = '$MQTT_CLIENT_ID'" >> settings.ini
+fi
 echo "user = '$MQTT_USER'" >> settings.ini
 echo "password = '$MQTT_PASSWORD'" >> settings.ini
 echo "[feed]" >> settings.ini
@@ -138,8 +161,8 @@ echo "level = $EMONCMS_LOG_LEVEL" >> settings.ini
 cp settings.ini $WWW/emoncms/settings.ini
 
 echo "CREATING USER/PWD FOR MOSQUITTO"
-touch /etc/mosquitto/passwd;\
-mosquitto_passwd -b /etc/mosquitto/passwd $MQTT_USER $MQTT_PASSWORD;\
+touch /etc/mosquitto/passwd
+mosquitto_passwd -b /etc/mosquitto/passwd $MQTT_USER $MQTT_PASSWORD
 
 echo "GENERATING config.cfg for BACKUP MODULE"
 echo "user=$DAEMON" > config.cfg
