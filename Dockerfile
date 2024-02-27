@@ -14,6 +14,7 @@ ARG \
 	# we dont modify php.ini, we create new extensions in conf.d
 	PHP_CONF=/etc/php8/conf.d \
 	REDIS_CONF=/etc/redis.conf \
+	USE_REDISPY_APK=1 \
 	# source for Mosquitto-PHP extension
 	# original repo is https://github.com/mgdm/Mosquitto-PHP
 	# but it does not work for php8
@@ -126,7 +127,8 @@ RUN set -x;\
 	git clone https://github.com/phpredis/phpredis;\
 	cd phpredis && phpize && ./configure && make && make install;\
 	printf "extension=redis.so" | tee $PHP_CONF/redis.ini 1>&2;\
-	pip3 install redis;\
+	if [ "$USE_REDISPY_APK" -ne 0 ]; then apk add --no-cache py3-redis; fi;\
+	if [ "$USE_REDISPY_APK" -eq 0 ]; then pip3 install redis; fi;\
 	git clone $MOSQUITTO_PHP;\
 	cd Mosquitto-PHP && phpize && ./configure && make && make install;\
 	printf "extension=mosquitto.so" | tee $PHP_CONF/mosquitto.ini 1>&2;\
@@ -147,7 +149,7 @@ RUN set -x;\
 	echo "require 'process_settings.php';" >> emoncmsdbupdate.php;\
 	echo "require 'core.php';" >> emoncmsdbupdate.php;\
 	echo "\$mysqli = @new mysqli(" >> emoncmsdbupdate.php;\
-	echo "    \$ssettings['sql']['server']," >> emoncmsdbupdate.php;\
+	echo "    \$settings['sql']['server']," >> emoncmsdbupdate.php;\
 	echo "    \$settings['sql']['username']," >> emoncmsdbupdate.php;\
 	echo "    \$settings['sql']['password']," >> emoncmsdbupdate.php;\
 	echo "    \$settings['sql']['database']," >> emoncmsdbupdate.php;\

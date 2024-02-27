@@ -11,8 +11,10 @@ jobs:
         include:
         - alpine_version: 3.16
           php_version: 8
+          use_redispy_apk: 0
         - alpine_version: 3.18
           php_version: 81
+          use_redispy_apk: 1
     steps:
       -
         name: Checkout
@@ -47,5 +49,6 @@ jobs:
             "BUILD_FROM=alpine:${{ matrix.alpine_version }}"
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
+            "USE_REDISPY_APK=${{ matrix.use_redispy_apk }}"
           push: true
           tags: alexjunk/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}
