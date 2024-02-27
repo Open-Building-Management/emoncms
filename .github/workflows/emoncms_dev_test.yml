@@ -9,7 +9,7 @@ jobs:
       matrix:
         include:
         - alpine_version: 3.19
-          php_version: 83
+          php_version: 82
     steps:
       -
         name: Checkout
@@ -45,4 +45,4 @@ jobs:
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
           push: true
-          tags: alexjunk/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}
+          tags: alexjunk/emoncms:dev_test_alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}
