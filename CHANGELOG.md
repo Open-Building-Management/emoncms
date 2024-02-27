@@ -1,5 +1,20 @@
 # Changelog
 
+## alpine3.19_emoncms11.4.11
+
+alpine3.19
+
+adding some security headers on apache :
+- X-Content-Type-Options
+- Strict-Transport-Security
+- X-Frame-Options, to defend against clickjacking
+- Referrer-Policy
+- Permissions-Policy
+
+Plus X-XSS-Protection
+
+Nota : too much inline javascript to add Content-Security-Policy...
+
 ## alpine3.18_emoncms11.4.11
 
 ability to configure TLS/HTTPS
