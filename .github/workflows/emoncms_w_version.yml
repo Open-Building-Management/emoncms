@@ -15,6 +15,9 @@ jobs:
         - alpine_version: 3.18
           php_version: 81
           use_redispy_apk: 1
+        - alpine_version: 3.19
+          php_version: 82
+          use_redispy_apk: 1
     steps:
       -
         name: Checkout
