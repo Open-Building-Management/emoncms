@@ -63,6 +63,12 @@ sed -i '/LoadModule rewrite_module/s/^#//g' $HTTP_CONF
 #sed -i '/<Directory "\/var\/www\/localhost\/htdocs\">/,/<\/Directory>/d' $HTTP_CONF
 # replace all occurences of localhost/htdocs by emoncms
 sed -i 's/localhost\/htdocs/emoncms/g' $HTTP_CONF
+# cf https://en.wikipedia.org/wiki/Standard_streams
+# redirecting apache logs to docker
+echo "APACHE ACCESS LOG TO STANDARD OUTPUT"
+sed -ri -e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' $HTTP_CONF
+echo "APACHE ERROR LOG TO STANDARD ERROR"
+sed -ri -e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' $HTTP_CONF
 VIRTUAL_HOST=/etc/apache2/conf.d/emoncms.conf
 echo "<VirtualHost *:80>" > $VIRTUAL_HOST
 #echo "    ServerName $CNAME" >> $VIRTUAL_HOST
