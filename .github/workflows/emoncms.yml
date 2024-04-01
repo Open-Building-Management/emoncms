@@ -9,8 +9,8 @@ jobs:
     strategy:
       matrix:
         include:
-        - alpine_version: 3.18
-          php_version: 81
+        - alpine_version: 3.19
+          php_version: 82
     steps:
       -
         name: Checkout
