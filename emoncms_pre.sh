@@ -4,6 +4,8 @@ cp /usr/share/zoneinfo/$TZ /etc/localtime
 
 NEW_INSTALL=0
 
+cd $OEM_DIR
+
 if ! [ -d "$EMONCMS_DATADIR" ]; then
     echo "Creating timeseries folders"
     mkdir -p "$EMONCMS_DATADIR"
@@ -16,6 +18,7 @@ else
 fi
 
 if ! [ -f "/config/security.conf" ]; then
+    echo "initializing a security.conf file in /config"
     cp security.conf /config/security.conf
 fi
 
@@ -52,8 +55,6 @@ if [ -f $OPTIONS_JSON ]; then
     if [ "$KEY" ]; then KEY_FILE=$KEY; fi
     if [ "$NAME" ]; then CNAME=$NAME; fi
 fi
-
-cd $OEM_DIR
 
 # REGENERATING CONF FILES FROM ENV VARS
 echo "CUSTOMIZING APACHE CONF FOR EMONCMS"
