@@ -51,4 +51,4 @@ jobs:
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
             "USE_REDISPY_APK=${{ matrix.use_redispy_apk }}"
           push: true
-          tags: alexjunk/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}
+          tags: alexjunk/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}_1

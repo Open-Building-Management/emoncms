@@ -1,5 +1,14 @@
 # Changelog
 
+## alpine3.19_emoncms11.4.11_1
+
+Adding a CUSTOM_APACHE_CONF option so the user can inject its custom headers in apache : 
+previously introduced security headers are removed by default
+
+redirecting :
+- apache access log to standard output
+- apache error log to error output
+
 ## alpine3.19_emoncms11.4.11
 
 alpine3.19

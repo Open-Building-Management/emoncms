@@ -1,6 +1,6 @@
 name: emoncms
 description: The webapp for energy monitoring and more
-version: alpine3.19_emoncms11.4.11
+version: alpine3.19_emoncms11.4.11_1
 image: alexjunk/emoncms
 webui: http://[HOST]:[PORT:8002]
 slug: emoncms
@@ -26,6 +26,7 @@ options:
   MQTT_LOG_LEVEL: error
   EMONCMS_LOG_LEVEL: 2
   LOW_WRITE_MODE: true
+  CUSTOM_APACHE_CONF: false
   CRT_FILE: /etc/ssl/apache2/server.pem
   KEY_FILE: /etc/ssl/apache2/server.key
   CNAME: localhost
@@ -37,6 +38,7 @@ schema:
   MQTT_LOG_LEVEL: list(error|information|notice|all)
   EMONCMS_LOG_LEVEL: list(1|2|3)
   LOW_WRITE_MODE: bool
+  CUSTOM_APACHE_CONF: bool
   CRT_FILE: str
   KEY_FILE: str
   CNAME: str

@@ -33,22 +33,20 @@ ENV \
 	EMONCMS_LOG_LOCATION=/var/log/emoncms \
 	MQTT_CONF=/etc/mosquitto/mosquitto.conf
 
-# /data creation
-RUN mkdir -p /data
-
-RUN apk update && apk upgrade
-
-RUN apk add --no-cache tzdata xz bash git make tar jq;\
+# /data creation and apk installation
+# php-gettext available via apk 
+RUN mkdir -p /data;\
+	mkdir -p /config;\
+	apk update && apk upgrade;\
+	apk add --no-cache tzdata xz bash git make tar jq;\
 	apk add --no-cache sed nano;\
 	apk add --no-cache python3;\
 	apk add --no-cache ca-certificates wget;\
 	apk add --no-cache apache2 apache2-ssl gettext;\
 	apk add --no-cache mariadb mariadb-client;\
 	apk add --no-cache redis;\
-	apk add --no-cache mosquitto
-
-# php-gettext available via apk 
-RUN apk add --no-cache php php-gettext php-apache2 php-mysqli;\
+	apk add --no-cache mosquitto;\
+	apk add --no-cache php php-gettext php-apache2 php-mysqli;\
 	apk add --no-cache php-gd php-curl php-common php-mbstring;\
 	apk add --no-cache php-session php-ctype
 
@@ -85,7 +83,7 @@ RUN set -x;\
 
 WORKDIR $OEM_DIR
 
-COPY makefile .
+COPY security.conf makefile .
 
 # the following 3 lines are for the admin module : not nice ;-(
 # in container the admin module is just to see emoncms log
@@ -243,7 +241,7 @@ ENV \
 	HTTP_CONF=/etc/apache2/httpd.conf \
 	CRT_FILE=/etc/ssl/apache2/server.pem \
 	KEY_FILE=/etc/ssl/apache2/server.key \
-	ENFORCE_SECURITY=1 \
+	CUSTOM_APACHE_CONF=0 \
 	USE_HOSTNAME_FOR_MQTT_TOPIC_CLIENTID=0 \
 	CNAME=localhost
 
