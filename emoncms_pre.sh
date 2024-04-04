@@ -76,7 +76,7 @@ sed -ri -e 's!^(\s*CustomLog)\s+\S+!\1 /proc/self/fd/1!g' $HTTP_CONF
 echo "APACHE ERROR LOG TO STANDARD ERROR"
 sed -ri -e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' $HTTP_CONF
 if [ "$CUSTOM_APACHE_CONF" -eq 1 ]; then
-	echo "IncludeOptional /config/*.conf" $HTTP_CONF
+	echo "IncludeOptional /config/*.conf" >> $HTTP_CONF
 fi
 VIRTUAL_HOST=/etc/apache2/conf.d/emoncms.conf
 echo "<VirtualHost *:80>" > $VIRTUAL_HOST
