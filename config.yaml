@@ -12,6 +12,7 @@ arch:
   - amd64
 map:
   - all_addon_configs
+  - addon_config:rw
   - ssl
 ports:
   443/tcp: 7443
