@@ -1,11 +1,16 @@
 # Changelog
 
+## alpine3.19_emoncms11.5.0
+
+ingress version :-)
+
 ## alpine3.19_emoncms11.4.11_1
 
-Adding a CUSTOM_APACHE_CONF option so the user can inject its custom headers in apache : 
+Adding a CUSTOM_APACHE_CONF option so the user can inject its custom headers in apache :
 previously introduced security headers are removed by default
 
 redirecting :
+
 - apache access log to standard output
 - apache error log to error output
 
@@ -14,6 +19,7 @@ redirecting :
 alpine3.19
 
 adding some security headers on apache :
+
 - X-Content-Type-Options
 - Strict-Transport-Security
 - X-Frame-Options, to defend against clickjacking
@@ -51,9 +57,9 @@ fixed format for mqtt level to something more readable than unix timestamp
 emoncms 11.3.22
 
 with modules :
+
 - postprocess 2.4.7
 - sync 2.1.4
 - graph 2.2.3
 - dashboard 2.3.3
 - backup 2.3.2
-

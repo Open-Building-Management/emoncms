@@ -1,4 +1,4 @@
-ARG BUILD_FROM=alpine:3.18
+ARG BUILD_FROM=alpine:3.19
 
 FROM $BUILD_FROM
 
@@ -9,17 +9,18 @@ ARG \
 	S6_DIR=/etc/s6-overlay/s6-rc.d \
 	PRIMOS="apache2 redis mosquitto mariadb" \
 	SECONDOS="emoncms_mqtt service-runner feedwriter" \
- 	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
-	PHP_VER=8 \
+	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
+	PHP_VER=82 \
 	# we dont modify php.ini, we create new extensions in conf.d
-	PHP_CONF=/etc/php8/conf.d \
+	PHP_CONF=/etc/php82/conf.d \
 	REDIS_CONF=/etc/redis.conf \
 	USE_REDISPY_APK=1 \
 	# source for Mosquitto-PHP extension
 	# original repo is https://github.com/mgdm/Mosquitto-PHP
 	# but it does not work for php8
 	MOSQUITTO_PHP=https://github.com/openenergymonitor/Mosquitto-PHP \
-	EMONCMS_SRC=https://github.com/emoncms/emoncms
+	EMONCMS_SRC=https://github.com/alexandrecuer/emoncms \
+	BRANCH=master
 
 # ENV vars used during build PLUS when starting the container
 # DAEMON is the user running the workers
@@ -34,7 +35,7 @@ ENV \
 	MQTT_CONF=/etc/mosquitto/mosquitto.conf
 
 # /data creation and apk installation
-# php-gettext available via apk 
+# php-gettext available via apk
 RUN mkdir -p /data;\
 	mkdir -p /config;\
 	apk update && apk upgrade;\
@@ -55,9 +56,9 @@ RUN mkdir -p /data;\
 # if using the s6-overlays tarballs & execlineb is missing : apk add --no-cache execline
 RUN set -x;\
 	case $TARGETPLATFORM in \
-		"linux/amd64")  S6_ARCH="x86_64"  ;; \
-		"linux/arm/v7") S6_ARCH="arm"  ;; \
-		"linux/arm64") S6_ARCH="aarch64"  ;; \
+	"linux/amd64")  S6_ARCH="x86_64"  ;; \
+	"linux/arm/v7") S6_ARCH="arm"  ;; \
+	"linux/arm64") S6_ARCH="aarch64"  ;; \
 	esac;\
 	wget -P /tmp $S6_SRC/v$S6_OVERLAY_VERSION/s6-overlay-$S6_ARCH.tar.xz --no-check-certificate;\
 	wget -P /tmp $S6_SRC/v$S6_OVERLAY_VERSION/s6-overlay-noarch.tar.xz --no-check-certificate;\
@@ -76,20 +77,20 @@ RUN set -x;\
 	chown $DAEMON /var/lock;\
 	# needed for the backup module when importing a tar.gz
 	chown $DAEMON /tmp;\
-	cd $WWW && git clone -b stable $EMONCMS_SRC;\
+	cd $WWW && git clone -b $BRANCH $EMONCMS_SRC;\
 	rm -Rf $WWW/emoncms/docs;\
 	mkdir -p /run/mysqld;\
 	chown -R mysql:mysql /run/mysqld
 
 WORKDIR $OEM_DIR
 
-COPY security.conf makefile .
+COPY security.conf makefile ./
 
 # the following 3 lines are for the admin module : not nice ;-(
 # in container the admin module is just to see emoncms log
 # solution could be not to use admin module anymore
 # for this set enable_admin_ui to false
-RUN set -x;\	
+RUN set -x;\
 	git config --system --replace-all safe.directory '*';\
 	git clone https://github.com/openenergymonitor/EmonScripts;\
 	cp EmonScripts/install/emonsd.config.ini EmonScripts/install/config.ini
@@ -137,8 +138,8 @@ RUN set -x;\
 
 COPY emoncms_pre.sh sql_ready.sh ./
 
-# we create dynamically the database update script 
-# as it uses the $WWW env which will not be available at run time in php 
+# we create dynamically the database update script
+# as it uses the $WWW env which will not be available at run time in php
 RUN set -x;\
 	echo "<?php" > emoncmsdbupdate.php;\
 	echo "\$applychanges = true;" >> emoncmsdbupdate.php;\
@@ -173,7 +174,7 @@ RUN set -x;\
 	for i in $PRIMOS; do touch $S6_DIR/user/contents.d/$i; done;\
 	for i in $PRIMOS; do echo "longrun" > $S6_DIR/$i/type; done;\
 	for i in $PRIMOS; do echo "#!/command/execlineb -P" > $S6_DIR/$i/run; done;\
-	echo "/usr/sbin/httpd -D FOREGROUND" >> $S6_DIR/apache2/run;\
+	echo "/command/foreground { rm -f /var/run/apache2/httpd.pid } /usr/sbin/httpd -D FOREGROUND" >> $S6_DIR/apache2/run;\
 	echo "redis-server $REDIS_CONF" >> $S6_DIR/redis/run;\
 	echo "mosquitto -c $MQTT_CONF" >> $S6_DIR/mosquitto/run;\
 	echo "s6-setuidgid mysql" >> $S6_DIR/mariadb/run;\
@@ -214,7 +215,7 @@ RUN set -x;\
 	chmod +x sql_ready.sh
 
 # ENV vars used when starting the container
-# fixing S6_SERVICES_GRACETIME & S6_CMD_WAIT_FOR_SERVICES_MAXTIME : 
+# fixing S6_SERVICES_GRACETIME & S6_CMD_WAIT_FOR_SERVICES_MAXTIME :
 # necessary as we launch mysql_install_db at startup
 ENV \
 	S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \

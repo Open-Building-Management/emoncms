@@ -1,8 +1,6 @@
 name: emoncms
 description: The webapp for energy monitoring and more
-version: alpine3.19_emoncms11.4.11_1
-image: alexjunk/emoncms
-webui: http://[HOST]:[PORT:8002]
+version: alpine3.19_emoncms11.5.0
 slug: emoncms
 url: https://github.com/Open-Building-Management/emoncms/issues
 init: false
@@ -14,9 +12,12 @@ map:
   - all_addon_configs
   - addon_config:rw
   - ssl
+ingress: true
+ingress_port: 80
+ingress_stream: true
 ports:
+  80/tcp: null
   443/tcp: 7443
-  80/tcp: 8002
   1883/tcp: 9883
 options:
   TZ: Europe/Paris

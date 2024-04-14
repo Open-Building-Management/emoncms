@@ -8,47 +8,42 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        emoncms_src: alexandrecuer/emoncms
+        branch: master
         include:
-        - alpine_version: 3.18
-          php_version: 81
-          use_redispy_apk: 1
-        - alpine_version: 3.19
-          php_version: 82
-          use_redispy_apk: 1
+          - alpine_version: 3.19
+            php_version: 82
+            use_redispy_apk: 1
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      -
-        name: Login to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - 
-        id: emoncms_version
+      - id: emoncms_version
         name: get emoncms version
         run: |
-          wget https://raw.githubusercontent.com/emoncms/emoncms/stable/version.json
-          master=$(cat version.json | jq --raw-output '.version')
-          echo $master
-          echo "master=$master" >> "$GITHUB_OUTPUT"
-      -
-        name: Build and push
+          wget https://raw.githubusercontent.com/${{ matrix.emoncms_src }}/${{ matrix.branch }}/version.json
+          version=$(cat version.json | jq --raw-output '.version')
+          echo $version
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
+            "EMONCMS_SRC=https://github.com/${{ matrix.emoncms_src }}"
+            "BRANCH=${{ matrix.branch }}"
             "BUILD_FROM=alpine:${{ matrix.alpine_version }}"
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
             "USE_REDISPY_APK=${{ matrix.use_redispy_apk }}"
           push: true
-          tags: alexjunk/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}_1
+          tags: alexjunk/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}
