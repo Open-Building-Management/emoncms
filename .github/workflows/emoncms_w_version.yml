@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        emoncms_src: alexandrecuer/emoncms
-        branch: master
+        emoncms_src: [alexandrecuer/emoncms]
+        branch: [master]
         include:
           - alpine_version: 3.19
             php_version: 82
