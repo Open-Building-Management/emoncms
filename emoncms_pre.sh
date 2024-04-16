@@ -12,10 +12,10 @@ if ! [ -d "$EMONCMS_DATADIR" ]; then
     mkdir -p "$EMONCMS_DATADIR/backup"
     mkdir -p "$EMONCMS_DATADIR/backup/uploads"
     for i in $TS; do mkdir -p "$EMONCMS_DATADIR/$i"; done
-    chown -R "$DAEMON" "$EMONCMS_DATADIR"
 else
     echo "Using existing timeseries"
 fi
+chown -R "$DAEMON" "$EMONCMS_DATADIR"
 
 if ! [ -f "/config/security.conf" ]; then
     echo "initializing a security.conf file in /config"
@@ -24,7 +24,7 @@ fi
 
 if ! [ -d "$EMONCMS_DATADIR/mysql" ]; then
     echo "Creating a new mariadb"
-    mysql_install_db --user=mysql --datadir="$EMONCMS_DATADIR/mysql" > /dev/null
+    mysql_install_db --datadir="$EMONCMS_DATADIR/mysql" > /dev/null
     # --skip-name-resolve --skip-test-db
     NEW_INSTALL=1
 else

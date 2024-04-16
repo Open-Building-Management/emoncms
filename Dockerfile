@@ -177,9 +177,10 @@ RUN set -x;\
 	echo "/command/foreground { rm -f /var/run/apache2/httpd.pid } /usr/sbin/httpd -D FOREGROUND" >> $S6_DIR/apache2/run;\
 	echo "redis-server $REDIS_CONF" >> $S6_DIR/redis/run;\
 	echo "mosquitto -c $MQTT_CONF" >> $S6_DIR/mosquitto/run;\
-	echo "s6-setuidgid mysql" >> $S6_DIR/mariadb/run;\
+	# we run mysql as root !
+	#echo "s6-setuidgid mysql" >> $S6_DIR/mariadb/run;\
 	# use mysqld_safe if you want no verbosity on stdout
-	echo "mysqld" >> $S6_DIR/mariadb/run
+	echo "mysqld --user=root" >> $S6_DIR/mariadb/run
 
 # user2 level services = workers
 RUN set -x;\
