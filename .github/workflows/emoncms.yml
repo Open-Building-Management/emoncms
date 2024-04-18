@@ -38,4 +38,4 @@ jobs:
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
           push: true
-          tags: alexjunk/emoncms:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:latest

@@ -31,9 +31,9 @@ jobs:
         name: get emoncms version
         run: |
           wget https://raw.githubusercontent.com/emoncms/emoncms/stable/version.json
-          master=$(cat version.json | jq --raw-output '.version')
-          echo $master
-          echo "master=$master" >> "$GITHUB_OUTPUT"
+          version=$(cat version.json | jq --raw-output '.version')
+          echo $version
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       -
         name: Build and push
         uses: docker/build-push-action@v5
@@ -45,4 +45,4 @@ jobs:
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
           push: true
-          tags: alexjunk/emoncms:dev_test_alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.master }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:dev_test_alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}
