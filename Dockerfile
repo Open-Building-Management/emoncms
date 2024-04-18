@@ -173,12 +173,12 @@ RUN set -x;\
 	for i in $PRIMOS; do touch $S6_DIR/user/contents.d/$i; done;\
 	for i in $PRIMOS; do echo "longrun" > $S6_DIR/$i/type; done;\
 	for i in $PRIMOS; do echo "#!/command/execlineb -P" > $S6_DIR/$i/run; done;\
-	echo "/usr/sbin/httpd -D FOREGROUND" >> $S6_DIR/apache2/run;\
+	echo "/command/foreground { rm -f /var/run/apache2/httpd.pid } /usr/sbin/httpd -D FOREGROUND" >> $S6_DIR/apache2/run;\
 	echo "redis-server $REDIS_CONF" >> $S6_DIR/redis/run;\
 	echo "mosquitto -c $MQTT_CONF" >> $S6_DIR/mosquitto/run;\
-	echo "s6-setuidgid mysql" >> $S6_DIR/mariadb/run;\
+	#echo "s6-setuidgid mysql" >> $S6_DIR/mariadb/run;\
 	# use mysqld_safe if you want no verbosity on stdout
-	echo "mysqld" >> $S6_DIR/mariadb/run
+	echo "mysqld --user=root" >> $S6_DIR/mariadb/run
 
 # user2 level services = workers
 RUN set -x;\
