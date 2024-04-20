@@ -6,11 +6,11 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-        - alpine_version: 3.19
-          php_version: 82
+    env:
+      emoncms_src: alexandrecuer/emoncms
+      branch: master
+      alpine_version: 3.19
+      php_version: 82
     steps:
       -
         name: Checkout
@@ -34,8 +34,10 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
-            "BUILD_FROM=alpine:${{ matrix.alpine_version }}"
-            "PHP_VER=${{ matrix.php_version }}"
-            "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
+            "EMONCMS_SRC=https://github.com/${{ env.emoncms_src }}"
+            "BRANCH=${{ env.branch }}"
+            "BUILD_FROM=alpine:${{ env.alpine_version }}"
+            "PHP_VER=${{ env.php_version }}"
+            "PHP_CONF=/etc/php${{ env.php_version }}/conf.d"
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:latest
