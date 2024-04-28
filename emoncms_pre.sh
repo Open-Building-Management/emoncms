@@ -42,6 +42,7 @@ if [ -f $OPTIONS_JSON ]; then
     if [ "$PASSWORD" ]; then MQTT_PASSWORD=$PASSWORD; fi
     if [ "$LOG_LEVEL" ]; then MQTT_LOG_LEVEL=$LOG_LEVEL; fi
     if [ "$HOST" ]; then MQTT_HOST=$HOST; fi
+    MQTT_BASETOPIC=$(jq --raw-output '.MQTT_BASETOPIC // empty' $OPTIONS_JSON)
     LOCAL_TZ=$(jq --raw-output '.TZ // empty' $OPTIONS_JSON)
     if [ "$LOCAL_TZ" ]; then TZ=$LOCAL_TZ; fi
     LOG_LEVEL=$(jq --raw-output '.EMONCMS_LOG_LEVEL // empty' $OPTIONS_JSON)

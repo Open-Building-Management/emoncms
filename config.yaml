@@ -1,6 +1,6 @@
 name: emoncms
 description: The webapp for energy monitoring and more
-version: alpine3.19_emoncms11.5.0
+version: alpine3.19_emoncms11.5.0_1
 image: alexjunk/emoncms
 slug: emoncms
 url: https://github.com/Open-Building-Management/emoncms/issues
@@ -23,6 +23,7 @@ ports:
 options:
   TZ: Europe/Paris
   MQTT_HOST: localhost
+  MQTT_BASETOPIC: emon
   MQTT_USER: emonpi
   MQTT_PASSWORD: emonpimqtt2016
   MQTT_LOG_LEVEL: error
@@ -35,6 +36,7 @@ options:
 schema:
   TZ: str
   MQTT_HOST: str
+  MQTT_BASETOPIC: str
   MQTT_USER: str
   MQTT_PASSWORD: str
   MQTT_LOG_LEVEL: list(error|information|notice|all)

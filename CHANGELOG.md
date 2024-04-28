@@ -1,5 +1,9 @@
 # Changelog
 
+## alpine3.19_emoncms11.5.0_1
+
+ability to customize the topic the mqtt worker is listening to
+
 ## alpine3.19_emoncms11.5.0
 
 ingress version :-)
