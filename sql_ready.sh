@@ -14,5 +14,7 @@ if [ "$NEW_INSTALL" -eq 1 ]; then
     mysql -e "CREATE DATABASE $MYSQL_DATABASE DEFAULT CHARACTER SET utf8;";\
     mysql -e "CREATE USER '$MYSQL_USER'@'localhost' IDENTIFIED BY '$MYSQL_PASSWORD';"
     mysql -e "GRANT ALL ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'localhost'; flush privileges;"
+    # home assistant, to access through a phpmyadmin container used as a addon
+    mysql -e "GRANT ALL ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'172.30.33.%' IDENTIFIED BY '$MYSQL_PASSWORD'; flush privileges;"
     php "$OEM_DIR/emoncmsdbupdate.php"
 fi
