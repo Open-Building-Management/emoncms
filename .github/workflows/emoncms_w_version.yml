@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        emoncms_src: [alexandrecuer/emoncms]
-        branch: [master]
+        emoncms_src: [emoncms/emoncms]
+        branch: [latest]
         include:
-          - alpine_version: 3.19
+          - alpine_version: 3.19.1
             php_version: 82
             use_redispy_apk: 1
     steps:
