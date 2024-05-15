@@ -7,9 +7,9 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     env:
-      emoncms_src: alexandrecuer/emoncms
-      branch: master
-      alpine_version: 3.19
+      emoncms_src: emoncms/emoncms
+      branch: stable
+      alpine_version: 3.19.1
       php_version: 82
     steps:
       -
