@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         emoncms_src: [emoncms/emoncms]
-        branch: [stable]
+        branch: [master]
         include:
           - alpine_version: 3.19.1
             php_version: 82
