@@ -1,5 +1,11 @@
 # Changelog
 
+## alpine3.19.1_emoncms11.5.7
+
+emoncms 11.5.7
+
+with unique identifier UUID generator
+
 ## alpine3.19.1_emoncms11.5.2
 
 emoncms 11.5.2

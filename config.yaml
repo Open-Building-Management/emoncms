@@ -1,6 +1,6 @@
 name: emoncms
 description: The webapp for energy monitoring and more
-version: alpine3.19.1_emoncms11.5.2
+version: alpine3.19.1_emoncms11.5.7
 image: alexjunk/emoncms
 slug: emoncms
 url: https://github.com/Open-Building-Management/emoncms/issues
