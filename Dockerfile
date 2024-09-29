@@ -8,7 +8,7 @@ ARG \
 	S6_SRC=https://github.com/just-containers/s6-overlay/releases/download \
 	S6_DIR=/etc/s6-overlay/s6-rc.d \
 	PRIMOS="apache2 redis mosquitto mariadb" \
-	SECONDOS="emoncms_mqtt service-runner feedwriter" \
+	SECONDOS="emoncms_mqtt service-runner feedwriter sync_upload" \
 	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
 	PHP_VER=82 \
 	# we dont modify php.ini, we create new extensions in conf.d
@@ -209,6 +209,8 @@ RUN set -x;\
 	echo "    exit 0" >> $S6_DIR/feedwriter/run;\
 	echo "fi" >> $S6_DIR/feedwriter/run;\
 	echo "exec s6-setuidgid $DAEMON php $WWW/emoncms/scripts/feedwriter.php" >> $S6_DIR/feedwriter/run;\
+	echo "s6-setuidgid $DAEMON" >> $S6_DIR/sync_upload/run;\
+	echo "php $EMONCMS_DIR/modules/sync/sync_upload.php all bg" >> $S6_DIR/sync_upload/run;\
 	#chown $DAEMON $OEM_DIR;\
 	chown -R $DAEMON $WWW/emoncms;\
 	chown -R $DAEMON $EMONCMS_DIR;\

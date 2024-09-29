@@ -11,8 +11,11 @@ jobs:
         emoncms_src: [emoncms/emoncms]
         branch: [master]
         include:
-          - alpine_version: 3.19.1
+          - alpine_version: '3.19.1'
             php_version: 82
+            use_redispy_apk: 1
+          - alpine_version: '3.20'
+            php_version: 83
             use_redispy_apk: 1
     steps:
       - name: Checkout
