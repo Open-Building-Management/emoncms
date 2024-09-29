@@ -6,10 +6,11 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    env:
+      emoncms_src: emoncms/emoncms
+      branch: master
     strategy:
       matrix:
-        emoncms_src: [emoncms/emoncms]
-        branch: [master]
         include:
           - alpine_version: '3.19.1'
             php_version: 82
@@ -32,7 +33,7 @@ jobs:
       - id: emoncms_version
         name: get emoncms version
         run: |
-          wget https://raw.githubusercontent.com/${{ matrix.emoncms_src }}/${{ matrix.branch }}/version.json
+          wget https://raw.githubusercontent.com/${{ env.emoncms_src }}/${{ env.branch }}/version.json
           version=$(cat version.json | jq --raw-output '.version')
           echo $version
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -42,8 +43,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
-            "EMONCMS_SRC=https://github.com/${{ matrix.emoncms_src }}"
-            "BRANCH=${{ matrix.branch }}"
+            "EMONCMS_SRC=https://github.com/${{ env.emoncms_src }}"
+            "BRANCH=${{ env.branch }}"
             "BUILD_FROM=alpine:${{ matrix.alpine_version }}"
             "PHP_VER=${{ matrix.php_version }}"
             "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
