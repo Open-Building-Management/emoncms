@@ -1,5 +1,21 @@
 # Changelog
 
+## alpine3.20_emoncms11.6.5
+
+emoncms 11.6.5
+
+with modules :
+
+- postprocess 2.4.7
+- sync 3.1.7
+- graph 2.2.4
+- dashboard 2.4.0
+- backup 2.3.3
+
+this version of sync introduces with the ability to automatically synchronize feeds from a sensor to another
+
+if using an existing database, dont forget to update your database structure through the emoncms admin module
+
 ## alpine3.19.1_emoncms11.5.7
 
 emoncms 11.5.7
