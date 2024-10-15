@@ -12,7 +12,7 @@ For more information, see https://github.com/emoncms/emoncms
 
 # ingress
 
-The addon runs in ingress mode a but you can also expose port(s)
+The addon runs in ingress mode but you can also expose port(s)
 
 # customize apache configuration and manage security headers
 
