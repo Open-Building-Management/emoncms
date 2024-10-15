@@ -6,6 +6,7 @@ It uses :
 - the eclipse mosquitto broker
 - redis as a data buffer when writing to disk on timeseries
 - three main workers to achieve background operations : emoncms_mqtt, service-runner and feedwriter
+- the sync_upload service to automatically upload feeds from an emoncms instance to another one and keep then synchronised
 
 For more information, see https://github.com/emoncms/emoncms
 
