@@ -103,6 +103,7 @@ RUN set -x;\
 	make symodule name=sync;\
 	make symodule name=postprocess;\
 	make symodule name=backup;\
+        make module name=device;\
 	# backup, sync and postprocess
 	# removing all trailing sudo instructions in Trystan shell scripts....
 	cd $EMONCMS_DIR/modules;\
