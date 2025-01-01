@@ -1,5 +1,18 @@
 # Changelog
 
+## alpine3.20_emoncms11.6.10
+
+device module addition @jeremyakers
+
+- Emoncms Core v11.6.10
+- App v3.0.1
+- Dashboard v2.4.1
+- Device v2.2.6
+- Graph v2.2.4
+- Backup v2.3.4
+- Postprocess v2.4.7
+- Sync v3.2.0
+
 ## alpine3.20_emoncms11.6.5
 
 emoncms 11.6.5
