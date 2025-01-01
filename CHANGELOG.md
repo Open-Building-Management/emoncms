@@ -4,6 +4,8 @@
 
 device module addition @jeremyakers
 
+if upgrading from an existing installation, update the database structure after upgrading
+
 - Emoncms Core v11.6.10
 - App v3.0.1
 - Dashboard v2.4.1
