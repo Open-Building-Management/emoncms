@@ -2,22 +2,36 @@ name: emoncms docker images to docker hub -  mention of emoncms version
 
 on:
   workflow_dispatch:
-
+    inputs:
+      github_username:
+        description: 'github username for emoncms src and symlinked modules'
+        required: true
+        type: string
+        default: 'emoncms'
+      branch:
+        description: 'branch to use for core and modules : stable or master ?'
+        required: true
+        type: string
+        default: 'stable'
+      alpine_version:
+        description: 'alpine version'
+        required: true
+        type: string
+        default: '3.20'
+      php_version:
+        description: 'php version'
+        required: true
+        type: string
+        default: '83'
+      use_redispy_apk:
+        description: 'install redispy through : apk 0 or 1 ?'
+        required: true
+        type: string
+        default: '1'
+      
 jobs:
   docker:
     runs-on: ubuntu-latest
-    env:
-      emoncms_src: emoncms/emoncms
-      branch: master
-    strategy:
-      matrix:
-        include:
-          - alpine_version: '3.19.1'
-            php_version: 82
-            use_redispy_apk: 1
-          - alpine_version: '3.20'
-            php_version: 83
-            use_redispy_apk: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +47,7 @@ jobs:
       - id: emoncms_version
         name: get emoncms version
         run: |
-          wget https://raw.githubusercontent.com/${{ env.emoncms_src }}/${{ env.branch }}/version.json
+          wget https://raw.githubusercontent.com/${{ inputs.github_username }}/emoncms/${{ inputs.branch }}/version.json
           version=$(cat version.json | jq --raw-output '.version')
           echo $version
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -43,11 +57,12 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
-            "EMONCMS_SRC=https://github.com/${{ env.emoncms_src }}"
-            "BRANCH=${{ env.branch }}"
-            "BUILD_FROM=alpine:${{ matrix.alpine_version }}"
-            "PHP_VER=${{ matrix.php_version }}"
-            "PHP_CONF=/etc/php${{ matrix.php_version }}/conf.d"
-            "USE_REDISPY_APK=${{ matrix.use_redispy_apk }}"
+            "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
+            "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
+            "BRANCH=${{ inputs.branch }}"
+            "BUILD_FROM=alpine:${{ inputs.alpine_version }}"
+            "PHP_VER=${{ inputs.php_version }}"
+            "PHP_CONF=/etc/php${{ inputs.php_version }}/conf.d"
+            "USE_REDISPY_APK=${{ inputs.use_redispy_apk }}"
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:alpine${{ matrix.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:alpine${{ inputs.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}

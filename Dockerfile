@@ -19,6 +19,8 @@ ARG \
 	# original repo is https://github.com/mgdm/Mosquitto-PHP
 	# but it does not work for php8
 	MOSQUITTO_PHP=https://github.com/openenergymonitor/Mosquitto-PHP \
+	# this is only for the makefile
+	SYMLINKED_MODULES_URL=https://github.com/emoncms \
 	EMONCMS_SRC=https://github.com/alexandrecuer/emoncms \
 	BRANCH=master
 

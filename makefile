@@ -11,7 +11,7 @@ symodule:
 	@mkdir -p $(EMONCMS_DIR)/modules
 	@if [ ! -d "$(EMONCMS_DIR)/modules/$(name)" ]; then\
 		echo "Installing module $(name)";\
-		cd $(EMONCMS_DIR)/modules && git clone -b stable https://github.com/emoncms/$(name);\
+		cd $(EMONCMS_DIR)/modules && git clone -b $(BRANCH) $(SYMLINKED_MODULES_URL)/$(name);\
 	fi
 	@if [ -d $(EMONCMS_DIR)/modules/$(name)/$(name)-module ]; then\
         	echo "symlinking IU directory";\
