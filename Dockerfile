@@ -80,7 +80,6 @@ RUN set -x;\
 	# needed for the backup module when importing a tar.gz
 	chown $DAEMON /tmp;\
 	cd $WWW && git clone -b $BRANCH $EMONCMS_SRC;\
-	rm -Rf $WWW/emoncms/docs;\
 	mkdir -p /run/mysqld;\
 	chown -R mysql:mysql /run/mysqld
 
@@ -105,16 +104,7 @@ RUN set -x;\
 	make symodule name=sync;\
 	make symodule name=postprocess;\
 	make symodule name=backup;\
-        make module name=device;\
-	# backup, sync and postprocess
-	# removing all trailing sudo instructions in Trystan shell scripts....
-	cd $EMONCMS_DIR/modules;\
-	sed -i 's/sudo //' backup/emoncms-import.sh;\
-	sed -i 's/sudo //' backup/emoncms-export.sh;\
-	sed -i 's/sudo //' sync/emoncms-sync.sh;\
-	sed -i 's/sudo //' postprocess/postprocess.sh;\
-	cd $EMONCMS_DIR/modules/postprocess/postprocess-module;\
-	sed -i 's/return $service_running/return true/' postprocess_model.php
+        make module name=device
 
 # redis and mosquitto conf : simple
 # build-base is required to compile with gcc
