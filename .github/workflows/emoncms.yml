@@ -1,16 +1,42 @@
-name: emoncms docker images to docker hub latest tag
+name: emoncms docker images to docker hub latest tag or dev_test
 
 on:
   workflow_dispatch:
+    inputs:
+      github_username:
+        description: 'github username for emoncms src and symlinked modules'
+        required: true
+        type: string
+        default: 'emoncms'
+      branch:
+        description: 'branch to use for core and modules : stable or master ?'
+        required: true
+        type: string
+        default: 'stable'
+      alpine_version:
+        description: 'alpine version'
+        required: true
+        type: string
+        default: '3.20'
+      php_version:
+        description: 'php version'
+        required: true
+        type: string
+        default: '83'
+      use_redispy_apk:
+        description: 'install redispy through : apk 0 or 1 ?'
+        required: true
+        type: string
+        default: '1'
+      tag:
+        description: 'tag : latest or dev_test ?'
+        required: true
+        type: string
+        default: 'latest'
 
 jobs:
   docker:
     runs-on: ubuntu-latest
-    env:
-      emoncms_src: emoncms/emoncms
-      branch: stable
-      alpine_version: 3.19.1
-      php_version: 82
     steps:
       -
         name: Checkout
@@ -34,10 +60,12 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
-            "EMONCMS_SRC=https://github.com/${{ env.emoncms_src }}"
-            "BRANCH=${{ env.branch }}"
-            "BUILD_FROM=alpine:${{ env.alpine_version }}"
-            "PHP_VER=${{ env.php_version }}"
-            "PHP_CONF=/etc/php${{ env.php_version }}/conf.d"
+            "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
+            "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
+            "BRANCH=${{ inputs.branch }}"
+            "BUILD_FROM=alpine:${{ inputs.alpine_version }}"
+            "PHP_VER=${{ inputs.php_version }}"
+            "PHP_CONF=/etc/php${{ inputs.php_version }}/conf.d"
+            "USE_REDISPY_APK=${{ inputs.use_redispy_apk }}"
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:${{ inputs.tag }}
