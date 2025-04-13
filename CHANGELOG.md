@@ -1,5 +1,21 @@
 # Changelog
 
+## alpine3.20_emoncms11.7.2
+
+Emoncms Core v11.7.2
+App v3.1.3
+Dashboard v2.4.1
+Device v2.2.6
+Graph v2.2.4
+Backup v2.3.4
+Postprocess v2.4.8
+Sync v3.2.0
+EmonScripts v1.8.7
+
+sync, backup, postprocess and core modified to add ability to update modules through admin UI
+
+cf https://github.com/Open-Building-Management/emoncms/issues/38
+
 ## alpine3.20_emoncms11.6.10
 
 device module addition @jeremyakers
