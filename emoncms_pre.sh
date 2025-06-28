@@ -38,6 +38,7 @@ if [ -f $OPTIONS_JSON ]; then
     PASSWORD=$(jq --raw-output '.MQTT_PASSWORD // empty' $OPTIONS_JSON)
     LOG_LEVEL=$(jq --raw-output '.MQTT_LOG_LEVEL // empty' $OPTIONS_JSON)
     HOST=$(jq --raw-output '.MQTT_HOST // empty' $OPTIONS_JSON)
+    MQTT_ANONYMOUS=$(jq --raw-output 'if .MQTT_ANONYMOUS==true then 1 else 0 end' $OPTIONS_JSON)
     if [ "$USER" ]; then MQTT_USER=$USER; fi
     if [ "$PASSWORD" ]; then MQTT_PASSWORD=$PASSWORD; fi
     if [ "$LOG_LEVEL" ]; then MQTT_LOG_LEVEL=$LOG_LEVEL; fi
@@ -117,9 +118,13 @@ echo "datadir=$EMONCMS_DATADIR/mysql" >> /etc/my.cnf
 echo "CREATING MQTT CONF"
 echo "persistence false" > "$MQTT_CONF"
 {
-  echo "allow_anonymous false"
   echo "listener 1883"
-  echo "password_file /etc/mosquitto/passwd"
+  if [ "$MQTT_ANONYMOUS" -eq 1 ]; then
+      echo "allow_anonymous true"
+  else
+      echo "allow_anonymous false"
+      echo "password_file /etc/mosquitto/passwd"
+  fi
   echo "log_dest stdout"
   echo "log_timestamp_format %Y-%m-%dT%H:%M:%S"
   for level in $MQTT_LOG_LEVEL; do echo "log_type $level"; done;
@@ -172,9 +177,11 @@ fi
 } >> settings.ini
 cp settings.ini "$WWW/emoncms/settings.ini"
 
-echo "CREATING USER/PWD FOR MOSQUITTO"
-touch /etc/mosquitto/passwd
-mosquitto_passwd -b /etc/mosquitto/passwd "$MQTT_USER" "$MQTT_PASSWORD"
+if [ "$MQTT_ANONYMOUS" -ne 1 ]; then
+    echo "CREATING USER/PWD FOR MOSQUITTO"
+    touch /etc/mosquitto/passwd
+    mosquitto_passwd -b /etc/mosquitto/passwd "$MQTT_USER" "$MQTT_PASSWORD"
+fi
 
 echo "GENERATING config.cfg for BACKUP MODULE"
 echo "user=$DAEMON" > config.cfg

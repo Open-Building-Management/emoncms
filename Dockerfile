@@ -104,7 +104,7 @@ RUN set -x;\
 	make symodule name=sync;\
 	make symodule name=postprocess;\
 	make symodule name=backup;\
-        make module name=device
+    make module name=device
 
 # redis and mosquitto conf : simple
 # build-base is required to compile with gcc
@@ -229,6 +229,7 @@ ENV \
 	MYSQL_DATABASE=emoncms \
 	MYSQL_USER=emoncms \
 	MYSQL_PASSWORD=emonpiemoncmsmysql2016 \
+	MQTT_ANONYMOUS=0 \
 	MQTT_USER=emonpi \
 	MQTT_PASSWORD=emonpimqtt2016 \
 	MQTT_HOST=localhost \
