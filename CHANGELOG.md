@@ -1,5 +1,13 @@
 # Changelog
 
+## alpine3.20_emoncms11.7.3
+
+allow anonymous mqtt
+
+Emoncms Core v11.7.3
+Graph v2.2.5
+EmonScripts v1.8.8
+
 ## alpine3.20_emoncms11.7.2
 
 Emoncms Core v11.7.2
