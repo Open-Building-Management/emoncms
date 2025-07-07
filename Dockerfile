@@ -9,6 +9,8 @@ ARG \
 	S6_DIR=/etc/s6-overlay/s6-rc.d \
 	PRIMOS="apache2 redis mosquitto mariadb" \
 	SECONDOS="emoncms_mqtt service-runner feedwriter sync_upload" \
+	MODULES="graph dashboard app device" \
+	SYMODULES="sync postprocess backup" \
 	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
 	PHP_VER=82 \
 	# we dont modify php.ini, we create new extensions in conf.d
@@ -98,13 +100,8 @@ RUN set -x;\
 
 # emoncms modules
 RUN set -x;\
-	make module name=graph;\
-	make module name=dashboard;\
-	make module name=app;\
-	make symodule name=sync;\
-	make symodule name=postprocess;\
-	make symodule name=backup;\
-    make module name=device
+	for i in $MODULES; do make module name=$i; done;\
+	for i in $SYMODULES; do make symodule name=$i; done;
 
 # redis and mosquitto conf : simple
 # build-base is required to compile with gcc
