@@ -101,7 +101,7 @@ RUN set -x;\
 # emoncms modules
 RUN set -x;\
 	for i in $MODULES; do make module name=$i; done;\
-	for i in $SYMODULES; do make symodule name=$i; done;
+	for i in $SYMODULES; do make symodule name=$i; done
 
 # redis and mosquitto conf : simple
 # build-base is required to compile with gcc
