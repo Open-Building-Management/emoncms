@@ -8,6 +8,21 @@ on:
         required: true
         type: string
         default: 'emoncms'
+      workers:
+        description: 'side workers'
+        required: true
+        type: string
+        default: 'emoncms_mqtt service-runner feedwriter sync_upload'
+      modules:
+        description: 'modules to install'
+        required: true
+        type: string
+        default: 'graph dashboard app device'
+      symodules:
+        description: 'symlinked modules to install'
+        required: true
+        type: string
+        default: 'sync postprocess backup'
       branch:
         description: 'branch to use for core and modules : stable or master ?'
         required: true
@@ -57,6 +72,9 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
+            "MODULES=${{ inputs.modules }}"
+            "SYMODULES=${{ inputs.symodules }}"
+            "SECONDOS=${{ inputs.workers }}"
             "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
             "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
             "BRANCH=${{ inputs.branch }}"
