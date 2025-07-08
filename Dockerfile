@@ -10,7 +10,9 @@ ARG \
 	PRIMOS="apache2 redis mosquitto mariadb" \
 	SECONDOS="emoncms_mqtt service-runner feedwriter sync_upload" \
 	MODULES="graph dashboard app device" \
+	MODULE_BRANCH="stable" \
 	SYMODULES="sync postprocess backup" \
+	SYMODULE_BRANCH="master"\
 	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
 	PHP_VER=82 \
 	# we dont modify php.ini, we create new extensions in conf.d
@@ -100,8 +102,8 @@ RUN set -x;\
 
 # emoncms modules
 RUN set -x;\
-	for i in $MODULES; do make module name=$i; done;\
-	for i in $SYMODULES; do make symodule name=$i; done;\
+	for i in $MODULES; do make module name=$i addon_branch=$MODULE_BRANCH; done;\
+	for i in $SYMODULES; do make symodule name=$i addon_branch=$SYMODULE_BRANCH; done;\
 	echo "modules installed"
 
 # redis and mosquitto conf : simple

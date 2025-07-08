@@ -18,11 +18,21 @@ on:
         required: true
         type: string
         default: 'graph dashboard app device'
+      module_branch:
+        description: 'branch to use for modules'
+        required: true
+        type: string
+        default: 'stable'
       symodules:
         description: 'symlinked modules to install'
         required: true
         type: string
         default: 'sync postprocess backup'
+      symodule_branch:
+        description: 'branch to use for symlinked modules'
+        required: true
+        type: string
+        default: 'master'
       branch:
         description: 'branch to use for core and modules : stable or master ?'
         required: true
@@ -74,6 +84,8 @@ jobs:
           build-args: |
             "MODULES=${{ inputs.modules }}"
             "SYMODULES=${{ inputs.symodules }}"
+            "MODULE_BRANCH=${{ inputs.module_branch }}"
+            "SYMODULE_BRANCH=${{ inputs.symodule_branch }}"
             "SECONDOS=${{ inputs.workers }}"
             "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
             "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
