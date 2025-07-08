@@ -34,7 +34,7 @@ on:
         type: string
         default: 'master'
       branch:
-        description: 'branch to use for core and modules : stable or master ?'
+        description: 'branch to use for core : stable, master...'
         required: true
         type: string
         default: 'stable'
