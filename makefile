@@ -1,6 +1,16 @@
 # Emoncms module makefile
 # Copyright (C) 2021 Alexandre Cuer <alexandre.cuer at cerema dot fr>
 
+ifndef $(addon_branch)
+ addon_branch=stable
+endif
+ifndef $(WWW)
+ WWW=/var/www
+endif
+ifndef $(EMONCMS_DIR)
+ EMONCMS_DIR=/opt/emoncms
+endif
+
 module:
 	@if [ ! -d "$(WWW)/emoncms/Modules/$(name)" ]; then\
 		echo "Installing module $(name)";\
