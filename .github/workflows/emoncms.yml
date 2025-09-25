@@ -48,11 +48,6 @@ on:
         required: true
         type: string
         default: '83'
-      use_redispy_apk:
-        description: 'install redispy through : apk 0 or 1 ?'
-        required: true
-        type: string
-        default: '1'
       tag:
         description: 'tag : latest or dev_test ?'
         required: true
@@ -94,6 +89,6 @@ jobs:
             "BUILD_FROM=alpine:${{ inputs.alpine_version }}"
             "PHP_VER=${{ inputs.php_version }}"
             "PHP_CONF=/etc/php${{ inputs.php_version }}/conf.d"
-            "USE_REDISPY_APK=${{ inputs.use_redispy_apk }}"
+            "USE_REDISPY_APK=1"
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.flavour }}:${{ inputs.tag }}
