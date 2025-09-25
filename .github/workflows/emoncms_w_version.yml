@@ -8,8 +8,13 @@ on:
         required: true
         type: string
         default: 'emoncms'
-      github_username:
-        description: 'github username for emoncms src and symlinked modules'
+      github_username_emoncms:
+        description: 'github username for emoncms src'
+        required: true
+        type: string
+        default: 'emoncms'
+      github_username_symodules:
+        description: 'github username for symlinked modules'
         required: true
         type: string
         default: 'emoncms'
@@ -67,7 +72,7 @@ jobs:
       - id: emoncms_version
         name: get emoncms version
         run: |
-          wget https://raw.githubusercontent.com/${{ inputs.github_username }}/emoncms/${{ inputs.branch }}/version.json
+          wget https://raw.githubusercontent.com/${{ inputs.github_username_emoncms }}/emoncms/${{ inputs.branch }}/version.json
           version=$(cat version.json | jq --raw-output '.version')
           echo $version
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -80,8 +85,8 @@ jobs:
             "MODULES=${{ inputs.modules }}"
             "SYMODULES=${{ inputs.symodules }}"
             "SECONDOS=${{ inputs.workers }}"
-            "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
-            "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
+            "EMONCMS_SRC=https://github.com/${{ inputs.github_username_emoncms }}/emoncms"
+            "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username_symodules }}"
             "BRANCH=${{ inputs.branch }}"
             "BUILD_FROM=alpine:${{ inputs.alpine_version }}"
             "PHP_VER=${{ inputs.php_version }}"
