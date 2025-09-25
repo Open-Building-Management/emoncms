@@ -3,6 +3,11 @@ name: emoncms docker images to docker hub -  mention of emoncms version
 on:
   workflow_dispatch:
     inputs:
+      flavour:
+        description: 'docker flavour : themis or emoncms'
+        required: true
+        type: string
+        default: 'emoncms'
       github_username:
         description: 'github username for emoncms src and symlinked modules'
         required: true
@@ -17,24 +22,14 @@ on:
         description: 'modules to install'
         required: true
         type: string
-        default: 'graph dashboard app device'
-      module_branch:
-        description: 'branch to use for modules'
-        required: true
-        type: string
-        default: 'stable'
+        default: 'graph:stable dashboard:stable app:stable device:stable'
       symodules:
         description: 'symlinked modules to install'
         required: true
         type: string
-        default: 'sync postprocess backup'
-      symodule_branch:
-        description: 'branch to use for symlinked modules'
-        required: true
-        type: string
-        default: 'master'
+        default: 'sync:master postprocess:master backup:master'
       branch:
-        description: 'branch to use for core : stable, master...'
+        description: 'branch to use for core : stable/master or release tag ?'
         required: true
         type: string
         default: 'stable'
@@ -84,8 +79,6 @@ jobs:
           build-args: |
             "MODULES=${{ inputs.modules }}"
             "SYMODULES=${{ inputs.symodules }}"
-            "MODULE_BRANCH=${{ inputs.module_branch }}"
-            "SYMODULE_BRANCH=${{ inputs.symodule_branch }}"
             "SECONDOS=${{ inputs.workers }}"
             "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
             "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
@@ -95,4 +88,4 @@ jobs:
             "PHP_CONF=/etc/php${{ inputs.php_version }}/conf.d"
             "USE_REDISPY_APK=${{ inputs.use_redispy_apk }}"
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:alpine${{ inputs.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.flavour }}:alpine${{ inputs.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}

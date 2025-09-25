@@ -3,6 +3,11 @@ name: emoncms docker images to docker hub latest tag or dev_test
 on:
   workflow_dispatch:
     inputs:
+      flavour:
+        description: 'docker flavour : themis or emoncms'
+        required: true
+        type: string
+        default: 'emoncms'
       github_username:
         description: 'github username for emoncms src and symlinked modules'
         required: true
@@ -17,14 +22,14 @@ on:
         description: 'modules to install'
         required: true
         type: string
-        default: 'graph dashboard app device'
+        default: 'graph:stable dashboard:stable app:stable device:stable'
       symodules:
         description: 'symlinked modules to install'
         required: true
         type: string
-        default: 'sync postprocess backup'
+        default: 'sync:master postprocess:master backup:master'
       branch:
-        description: 'branch to use for core and modules : stable or master ?'
+        description: 'branch to use for core : stable/master or release tag ?'
         required: true
         type: string
         default: 'stable'
@@ -86,4 +91,4 @@ jobs:
             "PHP_CONF=/etc/php${{ inputs.php_version }}/conf.d"
             "USE_REDISPY_APK=${{ inputs.use_redispy_apk }}"
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:${{ inputs.tag }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.flavour }}:${{ inputs.tag }}

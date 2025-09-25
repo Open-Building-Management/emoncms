@@ -9,10 +9,8 @@ ARG \
 	S6_DIR=/etc/s6-overlay/s6-rc.d \
 	PRIMOS="apache2 redis mosquitto mariadb" \
 	SECONDOS="emoncms_mqtt service-runner feedwriter sync_upload" \
-	MODULES="graph dashboard app device" \
-	MODULE_BRANCH="stable" \
-	SYMODULES="sync postprocess backup" \
-	SYMODULE_BRANCH="master"\
+	MODULES="graph:stable dashboard:stable app:stable device:stable" \
+	SYMODULES="sync:master postprocess:master backup:master" \
 	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
 	PHP_VER=82 \
 	# we dont modify php.ini, we create new extensions in conf.d
@@ -101,10 +99,18 @@ RUN set -x;\
 	cp EmonScripts/install/emonsd.config.ini EmonScripts/install/config.ini
 
 # emoncms modules
-RUN set -x;\
-	for i in $MODULES; do make module name=$i addon_branch=$MODULE_BRANCH; done;\
-	for i in $SYMODULES; do make symodule name=$i addon_branch=$SYMODULE_BRANCH; done;\
-	echo "modules installed"
+RUN set -x; \
+ 	for i in $MODULES; do \
+    		name=${i%%:*}; \
+    		ref=${i##*:}; \
+    		make module name=$name addon_ref=$ref; \
+  	done; \
+  	for i in $SYMODULES; do \
+    		name=${i%%:*}; \
+    		ref=${i##*:}; \
+    		make symodule name=$name addon_ref=$ref; \
+  	done; \
+  	echo "modules installed"
 
 # redis and mosquitto conf : simple
 # build-base is required to compile with gcc
