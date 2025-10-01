@@ -3,13 +3,38 @@ name: emoncms docker images to docker hub -  mention of emoncms version
 on:
   workflow_dispatch:
     inputs:
-      github_username:
-        description: 'github username for emoncms src and symlinked modules'
+      flavour:
+        description: 'docker flavour : themis or emoncms'
         required: true
         type: string
         default: 'emoncms'
+      github_username_emoncms:
+        description: 'github username for emoncms src'
+        required: true
+        type: string
+        default: 'emoncms'
+      github_username_symodules:
+        description: 'github username for symlinked modules'
+        required: true
+        type: string
+        default: 'emoncms'
+      workers:
+        description: 'side workers'
+        required: true
+        type: string
+        default: 'emoncms_mqtt service-runner feedwriter sync_upload'
+      modules:
+        description: 'modules to install'
+        required: true
+        type: string
+        default: 'graph:stable dashboard:stable app:stable device:stable'
+      symodules:
+        description: 'symlinked modules to install'
+        required: true
+        type: string
+        default: 'sync:master postprocess:master backup:master'
       branch:
-        description: 'branch to use for core and modules : stable or master ?'
+        description: 'branch to use for core : stable/master or release tag ?'
         required: true
         type: string
         default: 'stable'
@@ -47,7 +72,7 @@ jobs:
       - id: emoncms_version
         name: get emoncms version
         run: |
-          wget https://raw.githubusercontent.com/${{ inputs.github_username }}/emoncms/${{ inputs.branch }}/version.json
+          wget https://raw.githubusercontent.com/${{ inputs.github_username_emoncms }}/emoncms/${{ inputs.branch }}/version.json
           version=$(cat version.json | jq --raw-output '.version')
           echo $version
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -57,12 +82,15 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
-            "EMONCMS_SRC=https://github.com/${{ inputs.github_username }}/emoncms"
-            "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username }}"
+            "MODULES=${{ inputs.modules }}"
+            "SYMODULES=${{ inputs.symodules }}"
+            "SECONDOS=${{ inputs.workers }}"
+            "EMONCMS_SRC=https://github.com/${{ inputs.github_username_emoncms }}/emoncms"
+            "SYMLINKED_MODULES_URL=https://github.com/${{ inputs.github_username_symodules }}"
             "BRANCH=${{ inputs.branch }}"
             "BUILD_FROM=alpine:${{ inputs.alpine_version }}"
             "PHP_VER=${{ inputs.php_version }}"
             "PHP_CONF=/etc/php${{ inputs.php_version }}/conf.d"
             "USE_REDISPY_APK=${{ inputs.use_redispy_apk }}"
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/emoncms:alpine${{ inputs.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.flavour }}:alpine${{ inputs.alpine_version }}_emoncms${{ steps.emoncms_version.outputs.version }}
