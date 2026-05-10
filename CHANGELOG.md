@@ -1,5 +1,17 @@
 # Changelog
 
+## alpine3.20_emoncms11.11.3
+
+Emoncms Core v11.11.3
+App v3.1.7
+Dashboard v2.4.4
+Device v2.3.10
+Graph v2.2.7
+Backup v2.3.5
+Postprocess v2.5.3
+Sync v3.2.5
+EmonScripts v1.9.4
+
 ## alpine3.20_emoncms11.9.10
 
 Emoncms Core v11.9.10
