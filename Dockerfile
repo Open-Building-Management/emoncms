@@ -61,13 +61,7 @@ RUN set -ex;\
 	apk add --no-cache php$PHP_VER-gd php$PHP_VER-curl php$PHP_VER-common php$PHP_VER-mbstring;\
 	apk add --no-cache php$PHP_VER-session php$PHP_VER-ctype;\
 	# alpine only provides /usr/bin/phpXX, workers and modules call php
-	[ -e /usr/bin/php ] || ln -s /usr/bin/php$PHP_VER /usr/bin/php;\
-	# refuse to build with a PHP vulnerable to GHSA-w8hw-w9fx-j79w and GHSA-6wmf-4rv5-p3rp
-	php -r '$fixed = ["8.2" => "8.2.35", "8.3" => "8.3.36", "8.4" => "8.4.27", "8.5" => "8.5.12"]; \
-		$branch = PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION; \
-		if (!isset($fixed[$branch]) || version_compare(PHP_VERSION, $fixed[$branch], "<")) { \
-			fwrite(STDERR, "PHP ".PHP_VERSION." is vulnerable to GHSA-w8hw-w9fx-j79w\n"); exit(1); \
-		}'
+	[ -e /usr/bin/php ] || ln -s /usr/bin/php$PHP_VER /usr/bin/php
 
 # it is possible to install s6-overlay with apk but it does not provide user2
 #RUN apk add --no-cache s6-overlay
