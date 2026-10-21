@@ -17,4 +17,9 @@ if [ "$NEW_INSTALL" -eq 1 ]; then
     # home assistant, to access through a phpmyadmin container used as a addon
     mysql -e "GRANT ALL ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'172.30.33.%' IDENTIFIED BY '$MYSQL_PASSWORD'; flush privileges;"
     php "$OEM_DIR/emoncmsdbupdate.php"
+else
+    # upgrade system tables if the datadir was created by an older mariadb
+    # does nothing if they are already up to date
+    echo "Checking if mariadb system tables need an upgrade"
+    mariadb-upgrade
 fi
