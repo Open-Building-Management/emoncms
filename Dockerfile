@@ -1,20 +1,23 @@
-ARG BUILD_FROM=alpine:3.19
+ARG BUILD_FROM=alpine:3.24
 
 FROM $BUILD_FROM
 
 ARG \
 	TARGETPLATFORM \
-	S6_OVERLAY_VERSION=3.1.6.2 \
+	S6_OVERLAY_VERSION=3.2.3.2 \
 	S6_SRC=https://github.com/just-containers/s6-overlay/releases/download \
 	S6_DIR=/etc/s6-overlay/s6-rc.d \
+	# since s6-overlay 3.2, the user and user2 bundles live here
+	S6_BUNDLES=/etc/s6-overlay/user-bundles.d \
 	PRIMOS="apache2 redis mosquitto mariadb" \
 	SECONDOS="emoncms_mqtt service-runner feedwriter sync_upload" \
 	MODULES="graph:stable dashboard:stable app:stable device:stable" \
 	SYMODULES="sync:master postprocess:master backup:master" \
-	# PHP_VER needed to install the php-dev apk package and for the path to PHP CONF/INI files
-	PHP_VER=82 \
+	# PHP_VER needed to install the php apk packages and for the path to PHP CONF/INI files
+	PHP_VER=84 \
 	# we dont modify php.ini, we create new extensions in conf.d
-	PHP_CONF=/etc/php82/conf.d \
+	PHP_CONF=/etc/php84/conf.d \
+	PHPREDIS_VERSION=6.3.0 \
 	REDIS_CONF=/etc/redis.conf \
 	USE_REDISPY_APK=1 \
 	# source for Mosquitto-PHP extension
@@ -40,7 +43,9 @@ ENV \
 
 # /data creation and apk installation
 # php-gettext available via apk
-RUN mkdir -p /data;\
+# set -e so that a missing package fails the build
+RUN set -ex;\
+	mkdir -p /data;\
 	mkdir -p /config;\
 	apk update && apk upgrade;\
 	apk add --no-cache tzdata xz bash git make tar jq;\
@@ -48,12 +53,15 @@ RUN mkdir -p /data;\
 	apk add --no-cache python3;\
 	apk add --no-cache ca-certificates wget;\
 	apk add --no-cache apache2 apache2-ssl gettext;\
-	apk add --no-cache mariadb mariadb-client;\
+	# mariadb-server-utils provides mariadb-upgrade
+	apk add --no-cache mariadb mariadb-client mariadb-server-utils;\
 	apk add --no-cache redis;\
 	apk add --no-cache mosquitto;\
-	apk add --no-cache php php-gettext php-apache2 php-mysqli;\
-	apk add --no-cache php-gd php-curl php-common php-mbstring;\
-	apk add --no-cache php-session php-ctype
+	apk add --no-cache php$PHP_VER php$PHP_VER-gettext php$PHP_VER-apache2 php$PHP_VER-mysqli;\
+	apk add --no-cache php$PHP_VER-gd php$PHP_VER-curl php$PHP_VER-common php$PHP_VER-mbstring;\
+	apk add --no-cache php$PHP_VER-session php$PHP_VER-ctype;\
+	# alpine only provides /usr/bin/phpXX, workers and modules call php
+	[ -e /usr/bin/php ] || ln -s /usr/bin/php$PHP_VER /usr/bin/php
 
 # it is possible to install s6-overlay with apk but it does not provide user2
 #RUN apk add --no-cache s6-overlay
@@ -116,20 +124,34 @@ RUN set -x; \
 # build-base is required to compile with gcc
 # mosquitto-dev is needed to compile mosquitto-PHP
 # we need phpize so we install php-dev
-RUN set -x;\
+RUN set -ex;\
 	apk add --no-cache build-base mosquitto-dev;\
 	apk add --no-cache py3-pip php$PHP_VER-dev;\
 	sed -i "s/^save 900 1/#save 900 1/" $REDIS_CONF;\
 	sed -i "s/^save 300 1/#save 300 1/" $REDIS_CONF;\
 	sed -i "s/^save 60 1/#save 60 1/" $REDIS_CONF;\
-	git clone https://github.com/phpredis/phpredis;\
-	cd phpredis && phpize && ./configure && make && make install;\
+	git clone --depth 1 -b $PHPREDIS_VERSION https://github.com/phpredis/phpredis;\
+	# no && chains here, set -e would not catch a failure inside them
+	# alpine only provides versioned phpize and php-config
+	cd phpredis;\
+	phpize$PHP_VER;\
+	./configure --with-php-config=php-config$PHP_VER;\
+	make;\
+	make install;\
 	printf "extension=redis.so" | tee $PHP_CONF/redis.ini 1>&2;\
 	if [ "$USE_REDISPY_APK" -ne 0 ]; then apk add --no-cache py3-redis; fi;\
-	if [ "$USE_REDISPY_APK" -eq 0 ]; then pip3 install redis; fi;\
-	git clone $MOSQUITTO_PHP;\
-	cd Mosquitto-PHP && phpize && ./configure && make && make install;\
+	if [ "$USE_REDISPY_APK" -eq 0 ]; then pip3 install --break-system-packages redis; fi;\
+	git clone --depth 1 $MOSQUITTO_PHP;\
+	cd Mosquitto-PHP;\
+	phpize$PHP_VER;\
+	# musl strerror_r returns int, not char *, and gcc 14+ makes that an error
+	# the return value is not used so it is safe to keep it a warning
+	./configure --with-php-config=php-config$PHP_VER CFLAGS="-O2 -Wno-error=int-conversion";\
+	make;\
+	make install;\
 	printf "extension=mosquitto.so" | tee $PHP_CONF/mosquitto.ini 1>&2;\
+	php -m | grep -qx redis;\
+	php -m | grep -qx mosquitto;\
 	apk del --no-cache build-base mosquitto-dev;\
 	apk del --no-cache py3-pip php$PHP_VER-dev;\
 	# this will remove sources for phpredis and Mosquitto-PHP
@@ -139,7 +161,7 @@ COPY emoncms_pre.sh sql_ready.sh ./
 
 # we create dynamically the database update script
 # as it uses the $WWW env which will not be available at run time in php
-RUN set -x;\
+RUN set -ex;\
 	echo "<?php" > emoncmsdbupdate.php;\
 	echo "\$applychanges = true;" >> emoncmsdbupdate.php;\
 	echo "define('EMONCMS_EXEC', 1);" >> emoncmsdbupdate.php;\
@@ -158,19 +180,19 @@ RUN set -x;\
 
 # if s6-overlay is installed via apk, use bin and not command for execlineb !!
 # cf https://github.com/just-containers/s6-overlay/issues/449
-RUN set -x;\
+RUN set -ex;\
 	# initialize timeseries and mariadb with a oneshot service called emoncms_pre
 	mkdir $S6_DIR/emoncms_pre;\
 	mkdir $S6_DIR/emoncms_pre/dependencies.d;\
 	touch $S6_DIR/emoncms_pre/dependencies.d/base;\
 	echo "oneshot" > $S6_DIR/emoncms_pre/type;\
 	echo "$OEM_DIR/emoncms_pre.sh" > $S6_DIR/emoncms_pre/up;\
-	touch $S6_DIR/user/contents.d/emoncms_pre;\
+	touch $S6_BUNDLES/user/contents.d/emoncms_pre;\
 	# start primo services after emoncms_pre
 	for i in $PRIMOS; do mkdir $S6_DIR/$i; done;\
 	for i in $PRIMOS; do mkdir $S6_DIR/$i/dependencies.d; done;\
 	for i in $PRIMOS; do touch $S6_DIR/$i/dependencies.d/emoncms_pre; done;\
-	for i in $PRIMOS; do touch $S6_DIR/user/contents.d/$i; done;\
+	for i in $PRIMOS; do touch $S6_BUNDLES/user/contents.d/$i; done;\
 	for i in $PRIMOS; do echo "longrun" > $S6_DIR/$i/type; done;\
 	for i in $PRIMOS; do echo "#!/command/execlineb -P" > $S6_DIR/$i/run; done;\
 	echo "/command/foreground { rm -f /var/run/apache2/httpd.pid } /usr/sbin/httpd -D FOREGROUND" >> $S6_DIR/apache2/run;\
@@ -182,19 +204,19 @@ RUN set -x;\
 	echo "mysqld --user=root" >> $S6_DIR/mariadb/run
 
 # user2 level services = workers
-RUN set -x;\
+RUN set -ex;\
 	# check if SQL is fully ready with a oneshot service
 	mkdir $S6_DIR/sql_ready;\
 	mkdir $S6_DIR/sql_ready/dependencies.d;\
 	touch $S6_DIR/sql_ready/dependencies.d/legacy-services;\
 	echo "oneshot" > $S6_DIR/sql_ready/type;\
 	echo "$OEM_DIR/sql_ready.sh" > $S6_DIR/sql_ready/up;\
-	touch $S6_DIR/user2/contents.d/sql_ready;\
+	touch $S6_BUNDLES/user2/contents.d/sql_ready;\
 	# start all long running workers after sql_ready
 	for i in $SECONDOS; do mkdir $S6_DIR/$i; done;\
 	for i in $SECONDOS; do mkdir $S6_DIR/$i/dependencies.d; done;\
 	for i in $SECONDOS; do touch $S6_DIR/$i/dependencies.d/sql_ready; done;\
-	for i in $SECONDOS; do touch $S6_DIR/user2/contents.d/$i; done;\
+	for i in $SECONDOS; do touch $S6_BUNDLES/user2/contents.d/$i; done;\
 	for i in $SECONDOS; do echo "longrun" > $S6_DIR/$i/type; done;\
 	for i in $SECONDOS; do echo "#!/command/execlineb -P" > $S6_DIR/$i/run; done;\
 	echo "s6-setuidgid $DAEMON" >> $S6_DIR/emoncms_mqtt/run;\

@@ -1,5 +1,32 @@
 # Changelog
 
+## alpine3.24_emoncms12.2.0
+
+security update : PHP 8.4.27 fixes the critical RCE [GHSA-w8hw-w9fx-j79w](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) and [GHSA-6wmf-4rv5-p3rp](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp)
+
+- alpine 3.24
+- PHP 8.4.27
+- MariaDB 11.8
+- Redis 8.8
+- Mosquitto 2.1
+- Apache 2.4.69
+- s6-overlay 3.2.3.2
+- phpredis 6.3.0
+
+MariaDB system tables are upgraded automatically at startup when using an existing database created by an older MariaDB. MariaDB cannot be downgraded : backup before upgrading
+
+if upgrading from an existing installation, update the database structure after upgrading
+
+Emoncms Core v12.1.9
+App v3.8.2
+Dashboard v4.2.0
+Device v2.6.2
+Graph v3.5.0
+Backup v2.6.0
+Postprocess v2.8.1
+Sync v3.6.0
+EmonScripts v1.9.8
+
 ## alpine3.20_emoncms11.9.10
 
 Emoncms Core v11.9.10
