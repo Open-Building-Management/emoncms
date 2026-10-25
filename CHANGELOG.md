@@ -1,6 +1,6 @@
 # Changelog
 
-## alpine3.24_emoncms12.1.9
+## alpine3.24_emoncms12.2.0
 
 security update : PHP 8.4.27 fixes the critical RCE [GHSA-w8hw-w9fx-j79w](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) and [GHSA-6wmf-4rv5-p3rp](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp)
 
