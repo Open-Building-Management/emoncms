@@ -59,6 +59,7 @@ RUN set -ex;\
 	apk add --no-cache mosquitto;\
 	apk add --no-cache php$PHP_VER php$PHP_VER-gettext php$PHP_VER-apache2 php$PHP_VER-mysqli;\
 	apk add --no-cache php$PHP_VER-gd php$PHP_VER-curl php$PHP_VER-common php$PHP_VER-mbstring;\
+	apk add --no-cache php$PHP_VER-xml php$PHP_VER-dom;\
 	apk add --no-cache php$PHP_VER-session php$PHP_VER-ctype;\
 	# alpine only provides /usr/bin/phpXX, workers and modules call php
 	[ -e /usr/bin/php ] || ln -s /usr/bin/php$PHP_VER /usr/bin/php
